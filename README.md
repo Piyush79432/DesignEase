@@ -1,9 +1,10 @@
 # 🎨 DesignEase — The Ultimate Creative Workspace
 
-> **Create stunning digital documents, manage projects securely, and collaborate with your team in real-time.**
+> **Create stunning digital documents, manage secure projects, and control team access with ease.**
 
 ![Status](https://img.shields.io/badge/Status-Active-success?style=for-the-badge)
-![Stack](https://img.shields.io/badge/Stack-MERN_%2B_Socket.io-blueviolet?style=for-the-badge)
+![Editor](https://img.shields.io/badge/Editor-Drag_&_Drop-ff69b4?style=for-the-badge)
+![Stack](https://img.shields.io/badge/Stack-MERN_(No_Socket)-blueviolet?style=for-the-badge)
 ![Database](https://img.shields.io/badge/Data-MongoDB_Atlas-green?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-orange?style=for-the-badge)
 
@@ -11,25 +12,24 @@
 
 ## 📖 **Overview**
 
-**DesignEase** is a full-stack creative platform designed to replace multiple tools. It combines a powerful **Drag-and-Drop Editor** for creating digital documents (posters, resumes) with robust **Project Management** and **Real-Time Collaboration** tools.
+**DesignEase** is a full-stack creative platform designed to streamline digital asset creation and organization. It features a robust **Drag-and-Drop Editor** for creating posters and resumes, paired with a secure **Project Management System** backed by MongoDB Atlas.
 
-All data—from user designs to team chats—is securely stored and managed in the cloud using **MongoDB Atlas**.
+Unlike typical tools, DesignEase focuses on **Granular Access Control**, allowing owners to invite members to specific workspaces via secure **One-Time Access Codes**.
 
 ---
 
 ## 🏗️ **System Architecture**
 
-Below is the high-level flow of how DesignEase connects the User, Server, and Database.
+High-level data flow of the application:
 
 ```mermaid
-graph TD
+graph LR
     Client[User / Client Browser] 
-    Server[Node.js + Express Server]
+    Server[Node.js + Express API]
     DB[(MongoDB Atlas Cloud)]
     
     subgraph Frontend
-    Client -- "HTTP Requests (Fetch API)" --> Server
-    Client -- "Real-Time Events (Socket.io)" --> Server
+    Client -- "Fetch API (JSON)" --> Server
     end
     
     subgraph Backend
@@ -38,5 +38,5 @@ graph TD
     end
     
     subgraph Database
-    DB -- "JSON Data (Users, Chats, Folders)" --> Server
+    DB -- "Persistent Data" --> Server
     end
