@@ -1,102 +1,66 @@
-# 🎨 DesignEase — Collaborative Design & Chat Platform
+# 🎨 DesignEase — The Ultimate Creative Workspace
 
-> **An End-to-End Workspace for Teams to Design, Organize, and Collaborate in Real-Time.**
+> **Create stunning digital documents, manage projects securely, and collaborate with your team in real-time.**
 
-![Project Status](https://img.shields.io/badge/Status-Active-success?style=for-the-badge)
-![License](https://img.shields.io/badge/License-Free_to_Use-blue?style=for-the-badge)
-![Tech Stack](https://img.shields.io/badge/Stack-MERN_%2B_Socket.io-blueviolet?style=for-the-badge)
+![Status](https://img.shields.io/badge/Status-Active-success?style=for-the-badge)
+![Editor](https://img.shields.io/badge/Editor-Canva_Style-ff69b4?style=for-the-badge)
+![Stack](https://img.shields.io/badge/Stack-MERN_%2B_Socket.io-blueviolet?style=for-the-badge)
+![Database](https://img.shields.io/badge/Data-MongoDB_Atlas-green?style=for-the-badge)
 
 ---
 
 ## 📖 **Overview**
 
-**DesignEase** is a full-stack web application designed to streamline team collaboration. It combines powerful **Project Management** (folders, access control) with a robust **Real-Time Communication System** (chat, voice notes, image sharing).
+**DesignEase** is a powerful, full-stack creative platform designed to replace multiple tools. It combines a **Canva-like Drag-and-Drop Editor** for creating digital documents (posters, resumes, presentations) with robust **Project Management** and **Real-Time Collaboration** tools.
 
-Built with a focus on **Security** and **User Experience**, DesignEase allows teams to create secure workspaces in MongoDB Atlas, generate one-time access codes, and collaborate seamlessly without friction.
+All data—from user designs to team chats—is securely stored and managed in the cloud using **MongoDB Atlas**.
 
 ---
 
 ## ✨ **Key Features**
 
-### 🔐 **Secure Workspace Management**
-* **Create Folders:** Instantly generate project folders stored in **MongoDB Atlas**.
-* **One-Time Passwords (OTP):** Generate unique, single-use 6-digit codes to grant folder access.
-* **Role-Based Access:** Owners can View, Share, and **Revoke** access instantly.
+### 🖌️ **Canva-Like Creative Editor (`editor.html`)**
+* **Drag-and-Drop Interface:** Easily add text, images, shapes, and icons to your canvas.
+* **Customizable Templates:** Start with professional layouts for Resumes, Social Media Posts, and Presentations.
+* **Rich Media Support:** Upload your own images or generate assets using AI.
+* **Export Options:** Download your creations as high-quality **PDF**, **PNG**, or **JPG**.
 
-### 💬 **Real-Time Collaboration**
-* **Live Chat:** Instant messaging powered by **Socket.io**.
-* **Rich Media Support:** Share **Images** and **Voice Recordings** directly in the chat.
-* **Persistent History:** All chats and media are saved to the database, so you never lose context.
+### 🗄️ **Data Storage & Management**
+* **Cloud Storage:** All projects, folders, and assets are securely stored in **MongoDB Atlas**.
+* **Auto-Save:** Never lose your work; changes are synced to the database automatically.
+* **Structured Data:** Users, Groups, Messages, and Design Assets are organized in scalable collections (`Users`, `Folders`, `Messages`, `Designs`).
 
-### 🎨 **Captivating UI/UX**
-* **Glassmorphism Design:** Modern, translucent UI elements.
-* **Responsive Sidebar:** A professional navigation bar that adapts to your workflow.
-* **Interactive Modals:** Beautiful popups for creating groups and managing teams.
+### 🤝 **Real-Time Collaboration (`invite.html`)**
+* **Live Team Chat:** Discuss ideas instantly with built-in text, image, and voice messaging.
+* **Secure Sharing:** Share specific folders with team members using **One-Time Access Codes (OTP)**.
+* **Role Management:** Assign roles (Editor/Viewer) and revoke access anytime.
+
+### 📂 **Smart Dashboard (`projects.html`)**
+* **File Organization:** Manage your work in a hierarchical folder structure.
+* **Recent Activity:** Quick access to your most recently edited designs.
 
 ---
 
 ## 🛠️ **Tech Stack**
 
-| Component | Technology | Description |
+| Layer | Technology | Usage |
 | :--- | :--- | :--- |
-| **Frontend** | HTML5, CSS3, JavaScript | Modern, vanilla JS with custom glassmorphism CSS. |
-| **Backend** | Node.js, Express.js | Robust REST API handling routing and logic. |
-| **Database** | MongoDB Atlas | Cloud-native database for Users, Groups, and Chats. |
-| **Real-Time** | Socket.io | Bi-directional event-based communication. |
+| **Frontend** | HTML5, CSS3, JavaScript | Glassmorphism UI, Fabric.js (Canvas), DOM Manipulation. |
+| **Backend** | Node.js, Express.js | API routing, Auth logic, Socket handling. |
+| **Database** | **MongoDB Atlas** | Cloud NoSQL database for flexible data storage. |
+| **Real-Time** | Socket.io | Instant chat and live collaboration updates. |
 
 ---
 
-## 🚀 **Getting Started**
+## ⚙️ **Installation & Setup Guide**
 
-Follow these steps to get a local copy up and running in minutes.
+Follow these steps to get your own instance of DesignEase running with MongoDB Atlas.
 
-### **Prerequisites**
-* **Node.js** (v14 or higher) installed.
-* A **MongoDB Atlas** account (free tier is fine).
+### 1️⃣ **Prerequisites**
+* [Node.js](https://nodejs.org/) (v14+)
+* A generic text editor (VS Code recommended).
 
-### **Installation**
-
-1.  **Clone the Repository**
-    ```bash
-    git clone [https://github.com/your-username/designease.git](https://github.com/your-username/designease.git)
-    cd designease
-    ```
-
-2.  **Install Backend Dependencies**
-    ```bash
-    npm install
-    ```
-    *This installs `express`, `mongoose`, `cors`, `body-parser`, and `socket.io`.*
-
-3.  **Configure Database**
-    * Open `server.js`.
-    * Locate the `MONGO_URI` variable.
-    * Replace it with your **MongoDB Atlas Connection String**:
-        ```javascript
-        const MONGO_URI = "mongodb+srv://<username>:<password>@cluster0.mongodb.net/designease?retryWrites=true&w=majority";
-        ```
-
-4.  **Run the Server**
-    Start the backend server:
-    ```bash
-    node server.js
-    ```
-    *You should see: `🚀 Server running on http://localhost:5000`*
-
-5.  **Launch the App**
-    * Open `invite.html` (or `projects.html`) in your browser.
-    * **Pro Tip:** Use VS Code's "Live Server" extension for the best experience.
-
----
-
-## 📂 **Project Structure**
-
-```plaintext
-DesignEase/
-├── public/                 # Static assets (images, icons)
-├── server.js               # Main Backend Entry Point (API + Socket.io)
-├── invite.html             # Main Chat & Invite Interface
-├── projects.html           # Folder Management Interface
-├── index.html              # Landing Page
-├── package.json            # Dependencies list
-└── README.md               # This file
+### 2️⃣ **Clone the Repository**
+```bash
+git clone [https://github.com/Piyush79432/DesignEase.git](https://github.com/Piyush79432/DesignEase.git)
+cd DesignEase
