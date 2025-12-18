@@ -132,9 +132,9 @@ node server.js
 ### Start Frontend
 Open `index.html` or `home.html` using a local server such as **Live Server** in VS Code.
 
-```
 
 ## 📂 Project Structure
+```
 DesignEase/
 │
 ├── public/ # Assets (Images, Icons, Styles)
