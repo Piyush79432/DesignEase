@@ -1,0 +1,1301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DesignEase - AI Powered Creative Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* Enhanced color system and variables with Figma-inspired palette */
+        :root {
+            --primary: #5B6CF0;
+            --primary-dark: #4653DB;
+            --primary-light: #7C8AF5;
+            --secondary: #0EA5E9;
+            --accent: #EC4899;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --error: #EF4444;
+            
+            --dark-900: #0F172A;
+            --dark-800: #1E293B;
+            --dark-700: #334155;
+            --dark-600: #475569;
+            
+            --gray-50: #F8FAFC;
+            --gray-100: #F1F5F9;
+            --gray-200: #E2E8F0;
+            --gray-300: #CBD5E1;
+            --gray-500: #64748B;
+            --gray-600: #475569;
+            
+            --font-main: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-heading: 'Outfit', sans-serif;
+            
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+            --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+            
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+            --radius-2xl: 32px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body { 
+            font-family: var(--font-main); 
+            color: var(--dark-700); 
+            overflow-x: hidden; 
+            background: white;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Enhanced header with glass morphism effect */
+        header {
+            position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
+            padding: 20px 0; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: transparent;
+        }
+        header.scrolled {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px) saturate(180%);
+            padding: 14px 0;
+            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        header.scrolled .logo { color: var(--dark-900); }
+        header.scrolled nav a { color: var(--dark-700); }
+        header.scrolled nav a:hover { color: var(--primary); }
+        header.scrolled .btn-login-nav { 
+            color: var(--primary); 
+            border-color: var(--gray-200);
+            background: white;
+        }
+        header.scrolled .btn-login-nav:hover { 
+            background: var(--primary); 
+            color: white; 
+            border-color: var(--primary);
+        }
+
+        .container { width: 90%; max-width: 1280px; margin: 0 auto; }
+        nav { display: flex; justify-content: space-between; align-items: center; }
+        
+        .logo { 
+            font-size: 1.75rem; 
+            font-weight: 900; 
+            color: white; 
+            text-decoration: none; 
+            font-family: var(--font-heading);
+            letter-spacing: -0.5px;
+            transition: color 0.3s ease;
+        }
+        .logo span { 
+            background: linear-gradient(135deg, var(--secondary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        nav ul { display: flex; gap: 32px; list-style: none; align-items: center; }
+        nav a { 
+            color: rgba(255,255,255,0.95); 
+            text-decoration: none; 
+            font-weight: 500; 
+            transition: color 0.2s ease; 
+            font-size: 0.9375rem;
+            letter-spacing: -0.01em;
+        }
+        nav a:hover { color: white; }
+        
+        .btn-login-nav {
+            padding: 10px 24px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 100px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 0.9375rem;
+            letter-spacing: -0.01em;
+        }
+        .btn-login-nav:hover { 
+            background: white; 
+            color: var(--primary);
+            border-color: white;
+        }
+        .mobile-menu-btn { display: none; color: white; font-size: 1.5rem; cursor: pointer; }
+
+        /* Enhanced hero section - UNCHANGED */
+        #hero {
+            background: linear-gradient(135deg, 
+                rgba(15, 23, 42, 0.97) 0%, 
+                rgba(30, 41, 59, 0.95) 50%,
+                rgba(51, 65, 85, 0.93) 100%),
+                url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2064');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+            padding-top: 80px;
+            position: relative;
+            overflow: hidden;
+        }
+        #hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 20% 50%, rgba(91, 108, 240, 0.15) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(236, 72, 153, 0.15) 0%, transparent 50%);
+            pointer-events: none;
+        }
+        .hero-text { position: relative; z-index: 1; }
+        .hero-text h1 { 
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            line-height: 1.1;
+            margin-bottom: 24px;
+            font-weight: 800;
+            font-family: var(--font-heading);
+            letter-spacing: -0.03em;
+        }
+        .hero-text h1 span { 
+            background: linear-gradient(135deg, #7C8AF5 0%, #0EA5E9 50%, #EC4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .hero-text p { 
+            font-size: 1.25rem;
+            color: var(--gray-300);
+            margin-bottom: 40px;
+            max-width: 680px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.7;
+            font-weight: 400;
+            letter-spacing: -0.01em;
+        }
+        .btn-cta {
+            padding: 18px 48px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: white;
+            border-radius: 100px;
+            font-weight: 700;
+            font-size: 1.0625rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 10px 25px -5px rgba(91, 108, 240, 0.5), 0 8px 10px -6px rgba(91, 108, 240, 0.5);
+            letter-spacing: -0.01em;
+        }
+        .btn-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 35px -5px rgba(91, 108, 240, 0.6), 0 10px 15px -6px rgba(91, 108, 240, 0.6);
+        }
+
+        /* Updated Features section with specific feature cards for Resume, Cover Letters, Business Cards, Posters, Infographic Posters */
+        #features { 
+            padding: 120px 0;
+            background: linear-gradient(180deg, white 0%, var(--gray-50) 100%);
+        }
+        .features-header { 
+            text-align: center;
+            margin-bottom: 64px;
+            max-width: 720px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .features-header .section-title { 
+            font-size: clamp(2rem, 4vw, 3rem);
+            margin-bottom: 20px;
+            color: var(--dark-900);
+            font-family: var(--font-heading);
+            font-weight: 800;
+            line-height: 1.15;
+            letter-spacing: -0.02em;
+        }
+        .features-header p {
+            font-size: 1.0625rem;
+            line-height: 1.75;
+            color: var(--gray-600);
+            letter-spacing: -0.01em;
+        }
+        
+        .features-grid-enhanced {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 32px;
+        }
+        .feature-card-enhanced {
+            background: white;
+            padding: 40px 32px;
+            border-radius: var(--radius-xl);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: left;
+            border: 1px solid var(--gray-100);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .feature-card-enhanced:hover { 
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            border-color: var(--gray-200);
+        }
+        .feature-glow {
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(91, 108, 240, 0.15) 0%, transparent 60%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+        .feature-card-enhanced:hover .feature-glow { opacity: 1; }
+        
+        .icon-box-enhanced {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, rgba(91, 108, 240, 0.08), rgba(236, 72, 153, 0.08));
+            color: var(--primary);
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.625rem;
+            margin-bottom: 24px;
+            transition: all 0.3s ease;
+            border: 1px solid var(--gray-100);
+        }
+        .feature-card-enhanced:hover .icon-box-enhanced { 
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            transform: scale(1.05);
+        }
+        .feature-card-enhanced h3 { 
+            margin-bottom: 12px;
+            font-size: 1.25rem;
+            color: var(--dark-900);
+            font-weight: 700;
+            letter-spacing: -0.01em;
+        }
+        .feature-card-enhanced p { 
+            color: var(--gray-600);
+            line-height: 1.7;
+            font-size: 0.9375rem;
+            letter-spacing: -0.01em;
+            flex-grow: 1;
+        }
+
+        /* Enhanced footer */
+        footer { 
+            background: var(--dark-900);
+            color: var(--gray-500);
+            padding: 80px 0 32px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+        .footer-content { 
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 56px;
+            margin-bottom: 48px;
+        }
+        .footer-brand { margin-bottom: 20px; font-size: 1.75rem; font-weight: 900; color: white; font-family: var(--font-heading); }
+        .footer-desc { line-height: 1.7; color: var(--gray-500); margin-bottom: 24px; }
+        .social-links { display: flex; gap: 12px; }
+        .social-links a {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.05);
+            color: var(--gray-500);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        .social-links a:hover { background: var(--primary); color: white; transform: translateY(-2px); }
+        .footer-links h4 { 
+            color: white;
+            margin-bottom: 20px;
+            font-size: 1rem;
+            font-weight: 700;
+            font-family: var(--font-heading);
+        }
+        .footer-links ul { list-style: none; }
+        .footer-links ul li { margin-bottom: 12px; }
+        .footer-links ul li a {
+            color: var(--gray-500);
+            text-decoration: none;
+            transition: color 0.2s ease;
+            font-size: 0.9375rem;
+        }
+        .footer-links ul li a:hover { color: white; }
+        .footer-bottom { 
+            padding-top: 32px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            text-align: center;
+            color: var(--gray-500);
+            font-size: 0.875rem;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(8px);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .modal.show {
+            opacity: 1;
+        }
+        .modal-container {
+            display: flex;
+            width: 90%;
+            max-width: 950px;
+            max-height: 90vh;
+            background: white;
+            border-radius: var(--radius-2xl);
+            overflow: hidden;
+            box-shadow: var(--shadow-2xl);
+            animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        @keyframes slideUp {
+            from { transform: translateY(40px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-left {
+            width: 45%;
+            background: linear-gradient(135deg, 
+                rgba(15, 23, 42, 0.97) 0%, 
+                rgba(30, 41, 59, 0.95) 50%,
+                rgba(51, 65, 85, 0.93) 100%),
+                url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2064');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 48px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .modal-brand {
+            font-size: 1.75rem;
+            font-weight: 900;
+            font-family: var(--font-heading);
+            letter-spacing: -0.5px;
+        }
+        .modal-content-center h2 {
+            font-family: var(--font-heading);
+            line-height: 1.2;
+        }
+        .modal-features {
+            list-style: none;
+            margin-top: 24px;
+        }
+        .modal-features li {
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.9375rem;
+            color: var(--gray-300);
+        }
+        .modal-features li i {
+            color: var(--success);
+            font-size: 1rem;
+        }
+        .modal-quote {
+            padding: 24px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: var(--radius-lg);
+            border-left: 3px solid var(--primary);
+        }
+        .modal-quote h3 {
+            font-size: 1rem;
+            font-style: italic;
+            line-height: 1.6;
+            margin-bottom: 12px;
+            font-weight: 500;
+        }
+        .modal-quote p {
+            font-size: 0.875rem;
+            color: var(--gray-400);
+        }
+
+        .modal-right { 
+            width: 55%;
+            padding: 56px 48px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background: white;
+        }
+        
+        .close-btn { 
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            font-size: 1.25rem;
+            cursor: pointer;
+            color: var(--gray-500);
+            background: var(--gray-100);
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            border: none;
+        }
+        .close-btn:hover { 
+            color: white;
+            background: var(--error);
+        }
+
+        .auth-header { margin-bottom: 32px; }
+        .auth-title { 
+            font-size: 2rem;
+            color: var(--dark-900);
+            font-weight: 800;
+            margin-bottom: 8px;
+            font-family: var(--font-heading);
+            letter-spacing: -0.02em;
+        }
+        .auth-subtitle {
+            color: var(--gray-600);
+            font-size: 0.9375rem;
+            font-weight: 500;
+        }
+        
+        .input-group { margin-bottom: 20px; }
+        .input-group label { 
+            display: block;
+            font-size: 0.875rem;
+            margin-bottom: 8px;
+            color: var(--dark-900);
+            font-weight: 600;
+            letter-spacing: -0.01em;
+        }
+        
+        /* Fixed input wrapper to properly position password visibility toggle */
+        .input-wrapper {
+            position: relative;
+        }
+        .input-wrapper i.input-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-500);
+            font-size: 1rem;
+            pointer-events: none;
+        }
+        .input-wrapper .toggle-password {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-500);
+            cursor: pointer;
+            font-size: 1rem;
+            transition: color 0.2s ease;
+            z-index: 10;
+        }
+        .input-wrapper .toggle-password:hover {
+            color: var(--primary);
+        }
+        .input-wrapper input { 
+            width: 100%;
+            padding: 14px 46px 14px 46px;
+            border: 1.5px solid var(--gray-200);
+            border-radius: var(--radius-md);
+            outline: none;
+            transition: all 0.2s ease;
+            font-size: 0.9375rem;
+            font-family: var(--font-main);
+            background: white;
+        }
+        .input-wrapper input:focus { 
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(91, 108, 240, 0.1);
+        }
+        
+        .btn-primary-auth {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9375rem;
+            margin-top: 8px;
+            box-shadow: 0 4px 12px rgba(91, 108, 240, 0.25);
+            letter-spacing: -0.01em;
+        }
+        .btn-primary-auth:hover { 
+            transform: translateY(-1px);
+            box-shadow: 0 8px 20px rgba(91, 108, 240, 0.35);
+        }
+        
+        .error-message { 
+            background: #FEE2E2;
+            color: #DC2626;
+            padding: 12px 16px;
+            border-radius: var(--radius-md);
+            margin-bottom: 20px;
+            display: none;
+            font-size: 0.875rem;
+            border-left: 3px solid #DC2626;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500;
+        }
+        .error-message.show {
+            display: flex;
+        }
+        .error-message i { font-size: 1rem; }
+        
+        #name-field-group { display: none; }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 24px 0;
+            color: var(--gray-500);
+            font-size: 0.875rem;
+        }
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--gray-200);
+        }
+        .divider span {
+            padding: 0 16px;
+        }
+
+        .social-buttons {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        .btn-social {
+            flex: 1;
+            padding: 12px;
+            border: 1.5px solid var(--gray-200);
+            border-radius: var(--radius-md);
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 600;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-social:hover {
+            background: var(--gray-50);
+            border-color: var(--gray-300);
+            transform: translateY(-1px);
+        }
+        .btn-social i {
+            font-size: 1.125rem;
+        }
+        .btn-google { color: #DB4437; }
+        .btn-github { color: #333; }
+
+        .toggle-link {
+            text-align: center;
+            margin-top: 24px;
+            font-size: 0.875rem;
+            color: var(--gray-600);
+        }
+        .toggle-link a {
+            color: var(--primary);
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+        .toggle-link a:hover {
+            color: var(--primary-dark);
+        }
+
+        /* Enhanced success animation with more complex and immersive effects */
+        .success-animation {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+            position: relative;
+        }
+        
+        /* Confetti and particles animation */
+        .success-animation::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(91, 108, 240, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(236, 72, 153, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(14, 165, 233, 0.05) 0%, transparent 50%);
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.05); }
+        }
+        
+        .checkmark-wrapper {
+            position: relative;
+            margin-bottom: 32px;
+        }
+        
+        .checkmark-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #D1FAE5, #A7F3D0);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 40px rgba(16, 185, 129, 0.3);
+            position: relative;
+            animation: scaleIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: 10;
+        }
+        
+        @keyframes scaleIn {
+            0% { transform: scale(0) rotate(0deg); opacity: 0; }
+            50% { transform: scale(1.1) rotate(180deg); }
+            100% { transform: scale(1) rotate(360deg); opacity: 1; }
+        }
+        
+        .checkmark-circle i { 
+            font-size: 56px; 
+            color: #10B981;
+            animation: checkmarkPop 0.3s ease 0.5s both;
+        }
+        
+        @keyframes checkmarkPop {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        
+        /* Animated rings around checkmark */
+        .success-ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 3px solid rgba(16, 185, 129, 0.3);
+            animation: ringExpand 1.5s ease-out infinite;
+        }
+        
+        .success-ring:nth-child(2) {
+            animation-delay: 0.3s;
+        }
+        
+        .success-ring:nth-child(3) {
+            animation-delay: 0.6s;
+        }
+        
+        @keyframes ringExpand {
+            0% {
+                width: 120px;
+                height: 120px;
+                opacity: 1;
+            }
+            100% {
+                width: 200px;
+                height: 200px;
+                opacity: 0;
+            }
+        }
+        
+        /* Floating particles */
+        .success-particle {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            animation: floatParticle 2s ease-in-out infinite;
+        }
+        
+        .success-particle:nth-child(4) {
+            top: 10%;
+            left: 20%;
+            animation-delay: 0s;
+            background: var(--primary);
+        }
+        
+        .success-particle:nth-child(5) {
+            top: 20%;
+            right: 15%;
+            animation-delay: 0.3s;
+            background: var(--secondary);
+        }
+        
+        .success-particle:nth-child(6) {
+            bottom: 15%;
+            left: 25%;
+            animation-delay: 0.6s;
+            background: var(--accent);
+        }
+        
+        .success-particle:nth-child(7) {
+            bottom: 20%;
+            right: 20%;
+            animation-delay: 0.9s;
+            background: var(--success);
+        }
+        
+        @keyframes floatParticle {
+            0%, 100% { transform: translateY(0px) scale(1); opacity: 0.8; }
+            50% { transform: translateY(-20px) scale(1.2); opacity: 1; }
+        }
+        
+        .success-animation h2 {
+            color: var(--dark-900);
+            margin-bottom: 12px;
+            font-size: 2rem;
+            font-family: var(--font-heading);
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            animation: slideUpFade 0.6s ease 0.8s both;
+        }
+        
+        .success-animation p {
+            color: var(--gray-600);
+            font-size: 1.0625rem;
+            margin-bottom: 24px;
+            animation: slideUpFade 0.6s ease 1s both;
+        }
+        
+        @keyframes slideUpFade {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .success-loading {
+            margin-top: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            animation: slideUpFade 0.6s ease 1.2s both;
+        }
+        
+        .success-loading-text {
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 0.9375rem;
+        }
+        
+        .loading-dots {
+            display: flex;
+            gap: 6px;
+        }
+        
+        .loading-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--primary);
+            animation: dotBounce 1.4s ease-in-out infinite;
+        }
+        
+        .loading-dot:nth-child(2) { animation-delay: 0.2s; }
+        .loading-dot:nth-child(3) { animation-delay: 0.4s; }
+        
+        @keyframes dotBounce {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-10px); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .modal-container {
+                flex-direction: column;
+                max-height: 95vh;
+                overflow-y: auto;
+            }
+            .modal-left, .modal-right {
+                width: 100%;
+            }
+            .modal-left {
+                min-height: 200px;
+                padding: 32px 24px;
+            }
+            .modal-right {
+                padding: 40px 24px;
+            }
+            .features-grid-enhanced {
+                grid-template-columns: 1fr;
+            }
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+            nav ul {
+                display: none;
+            }
+            .mobile-menu-btn {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header id="header">
+        <div class="container">
+            <nav>
+                <a href="#" class="logo">Design<span>Ease</span></a>
+                <ul>
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#pricing">Pricing</a></li>
+                    <li><button class="btn-login-nav" onclick="openModal()">Get Started</button></li>
+                </ul>
+                <div class="mobile-menu-btn">
+                    <i class="fas fa-bars"></i>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section - UNCHANGED -->
+    <section id="hero">
+        <div class="hero-text">
+            <h1>Create Stunning Designs with <span>AI Power</span></h1>
+            <p>Transform your ideas into professional designs in seconds. DesignEase combines cutting-edge AI technology with intuitive design tools.</p>
+            <button class="btn-cta" onclick="openModal()">Start Creating Free</button>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features">
+        <div class="container">
+            <div class="features-header">
+                <h2 class="section-title">Professional Design Tools at Your Fingertips</h2>
+                <p>Create stunning professional materials with AI-powered design tools. Perfect for job seekers, businesses, and creative professionals.</p>
+            </div>
+            
+            <div class="features-grid-enhanced">
+                <div class="feature-card-enhanced">
+                    <div class="feature-glow"></div>
+                    <div class="icon-box-enhanced">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <div>
+                        <h3>Resume & CV Builder</h3>
+                        <p>Create professional resumes and CVs with AI-powered formatting. Choose from dozens of ATS-friendly templates designed to get you noticed by recruiters.</p>
+                    </div>
+                </div>
+
+                <div class="feature-card-enhanced">
+                    <div class="feature-glow"></div>
+                    <div class="icon-box-enhanced">
+                        <i class="fas fa-envelope-open-text"></i>
+                    </div>
+                    <div>
+                        <h3>Cover Letter Generator</h3>
+                        <p>Generate compelling cover letters tailored to any job. Our AI analyzes job descriptions and creates personalized letters that highlight your strengths.</p>
+                    </div>
+                </div>
+
+                <div class="feature-card-enhanced">
+                    <div class="feature-glow"></div>
+                    <div class="icon-box-enhanced">
+                        <i class="fas fa-id-card"></i>
+                    </div>
+                    <div>
+                        <h3>Business Card Designer</h3>
+                        <p>Design professional business cards that make lasting impressions. Customize colors, fonts, and layouts with our intuitive drag-and-drop editor.</p>
+                    </div>
+                </div>
+
+                <div class="feature-card-enhanced">
+                    <div class="feature-glow"></div>
+                    <div class="icon-box-enhanced">
+                        <i class="fas fa-image"></i>
+                    </div>
+                    <div>
+                        <h3>Poster Creator</h3>
+                        <p>Create eye-catching posters for events, promotions, or announcements. Access thousands of templates and customize every element to match your brand.</p>
+                    </div>
+                </div>
+
+                <div class="feature-card-enhanced">
+                    <div class="feature-glow"></div>
+                    <div class="icon-box-enhanced">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <div>
+                        <h3>Infographic Maker</h3>
+                        <p>Transform complex data into beautiful infographics. Perfect for presentations, reports, and social media. Make your information visual and engaging.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div>
+                    <div class="footer-brand">DesignEase</div>
+                    <p class="footer-desc">Transform your creative ideas into stunning designs with AI-powered tools. Join thousands of creators worldwide.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+                <div class="footer-links">
+                    <h4>Product</h4>
+                    <ul>
+                        <li><a href="#">Features</a></li>
+                        <li><a href="#">Templates</a></li>
+                        <li><a href="#">Pricing</a></li>
+                        <li><a href="#">API</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="#">About</a></li>
+                        <li><a href="#">Blog</a></li>
+                        <li><a href="#">Careers</a></li>
+                        <li><a href="#">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="#">Help Center</a></li>
+                        <li><a href="#">Community</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 DesignEase. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Authentication Modal -->
+    <div class="modal" id="authModal">
+        <div class="modal-container">
+            <div class="modal-left">
+                <div class="modal-brand">DesignEase</div>
+                <div class="modal-content-center">
+                    <h2 style="font-size: 2rem; margin-bottom: 12px; font-weight: 800; line-height: 1.2;">Start Creating Amazing Designs Today</h2>
+                    <ul class="modal-features">
+                        <li><i class="fas fa-check"></i>Unlimited AI-powered designs</li>
+                        <li><i class="fas fa-check"></i>Access to premium templates</li>
+                        <li><i class="fas fa-check"></i>Real-time collaboration tools</li>
+                        <li><i class="fas fa-check"></i>Cloud storage & export</li>
+                    </ul>
+                </div>
+                <div class="modal-quote">
+                    <h3>"DesignEase transformed how we create content. Absolutely game-changing!"</h3>
+                    <p>— Sarah Chen, Creative Director</p>
+                </div>
+            </div>
+            <div class="modal-right">
+                <button class="close-btn" onclick="closeModal()"><i class="fas fa-times"></i></button>
+                <div id="authForm">
+                    <div class="auth-header">
+                        <h2 class="auth-title" id="modal-title">Welcome Back</h2>
+                        <p class="auth-subtitle" id="modal-subtitle">Sign in to continue your creative journey</p>
+                    </div>
+                    <div class="error-message" id="error-msg">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span></span>
+                    </div>
+                    
+                    <div class="social-buttons">
+                        <button type="button" class="btn-social btn-google" onclick="handleGoogleLogin()">
+                            <i class="fab fa-google"></i>
+                            Google
+                        </button>
+                        <button type="button" class="btn-social btn-github" onclick="handleGithubLogin()">
+                            <i class="fab fa-github"></i>
+                            GitHub
+                        </button>
+                    </div>
+
+                    <div class="divider">
+                        <span>or continue with email</span>
+                    </div>
+
+                    <form id="loginForm">
+                        <div class="input-group" id="name-field-group">
+                            <label for="name">Full Name</label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-user input-icon"></i>
+                                <input type="text" id="name" placeholder="Enter your full name">
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label for="email">Email Address</label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-envelope input-icon"></i>
+                                <input type="email" id="email" placeholder="you@example.com" required>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label for="password">Password</label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-lock input-icon"></i>
+                                <input type="password" id="password" placeholder="Enter your password" required>
+                                <i class="fas fa-eye toggle-password" id="togglePassword"></i>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-primary-auth" id="submit-btn">Sign In</button>
+                    </form>
+                    <div class="toggle-link">
+                        <span id="toggle-text">Don't have an account? <a onclick="toggleForm()">Sign Up</a></span>
+                    </div>
+                </div>
+                
+                <!-- Enhanced Success Animation -->
+                <div class="success-animation" id="successAnimation">
+                    <div class="checkmark-wrapper">
+                        <div class="success-ring"></div>
+                        <div class="success-ring"></div>
+                        <div class="success-ring"></div>
+                        <div class="success-particle"></div>
+                        <div class="success-particle"></div>
+                        <div class="success-particle"></div>
+                        <div class="success-particle"></div>
+                        <div class="checkmark-circle">
+                            <i class="fas fa-check"></i>
+                        </div>
+                    </div>
+                    <h2>Welcome to DesignEase!</h2>
+                    <p>Your account has been created successfully</p>
+                    <div class="success-loading">
+                        <span class="success-loading-text">Redirecting to dashboard</span>
+                        <div class="loading-dots">
+                            <div class="loading-dot"></div>
+                            <div class="loading-dot"></div>
+                            <div class="loading-dot"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // API endpoint configuration
+        const API_URL = 'http://localhost:5000';
+
+        // Header scroll effect
+        window.addEventListener('scroll', () => {
+            const header = document.getElementById('header');
+            if (window.scrollY > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+
+        // Modal functions
+        let isLoginMode = true;
+
+        function openModal() {
+            const modal = document.getElementById('authModal');
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('show'), 10);
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('authModal');
+            modal.classList.remove('show');
+            setTimeout(() => modal.style.display = 'none', 300);
+            document.getElementById('authForm').style.display = 'block';
+            document.getElementById('successAnimation').style.display = 'none';
+        }
+
+        function toggleForm() {
+            isLoginMode = !isLoginMode;
+            const title = document.getElementById('modal-title');
+            const subtitle = document.getElementById('modal-subtitle');
+            const submitBtn = document.getElementById('submit-btn');
+            const toggleText = document.getElementById('toggle-text');
+            const nameField = document.getElementById('name-field-group');
+
+            if (isLoginMode) {
+                title.textContent = 'Welcome Back';
+                subtitle.textContent = 'Sign in to continue your creative journey';
+                submitBtn.textContent = 'Sign In';
+                toggleText.innerHTML = 'Don\'t have an account? <a onclick="toggleForm()">Sign Up</a>';
+                nameField.style.display = 'none';
+            } else {
+                title.textContent = 'Create Account';
+                subtitle.textContent = 'Join thousands of creators using DesignEase';
+                submitBtn.textContent = 'Create Account';
+                toggleText.innerHTML = 'Already have an account? <a onclick="toggleForm()">Sign In</a>';
+                nameField.style.display = 'block';
+            }
+        }
+
+        // Password visibility toggle
+        const togglePassword = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('password');
+
+        togglePassword.addEventListener('click', function() {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            this.classList.toggle('fa-eye');
+            this.classList.toggle('fa-eye-slash');
+        });
+
+        // Form submission with MongoDB integration
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const name = document.getElementById('name').value;
+
+            // Basic validation
+            if (!email || !password || (!isLoginMode && !name)) {
+                showError('Please fill in all fields');
+                return;
+            }
+
+            if (password.length < 6) {
+                showError('Password must be at least 6 characters');
+                return;
+            }
+
+            try {
+                const endpoint = isLoginMode ? '/api/login' : '/api/register';
+                const body = isLoginMode 
+                    ? { email, password }
+                    : { name, email, password };
+
+                const response = await fetch(`${API_URL}${endpoint}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(body)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Show success animation
+                    document.getElementById('authForm').style.display = 'none';
+                    document.getElementById('successAnimation').style.display = 'flex';
+
+                    // Store user data
+                    localStorage.setItem('user', JSON.stringify({ email, name: data.user || name }));
+
+                    // Navigate to home.html after animation
+                    setTimeout(() => {
+                        window.location.href = 'home.html';
+                    }, 3000);
+                } else {
+                    showError(data.message || 'Authentication failed');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showError('Unable to connect to server. Please try again.');
+            }
+        });
+
+        function showError(message) {
+            const errorMsg = document.getElementById('error-msg');
+            errorMsg.querySelector('span').textContent = message;
+            errorMsg.classList.add('show');
+            setTimeout(() => {
+                errorMsg.classList.remove('show');
+            }, 4000);
+        }
+
+        function handleGoogleLogin() {
+            // Show success animation for OAuth flow
+            document.getElementById('authForm').style.display = 'none';
+            document.getElementById('successAnimation').style.display = 'flex';
+            
+            setTimeout(() => {
+                window.location.href = 'home.html';
+            }, 3000);
+        }
+
+        function handleGithubLogin() {
+            // Show success animation for OAuth flow
+            document.getElementById('authForm').style.display = 'none';
+            document.getElementById('successAnimation').style.display = 'flex';
+            
+            setTimeout(() => {
+                window.location.href = 'home.html';
+            }, 3000);
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('authModal').addEventListener('click', (e) => {
+            if (e.target.id === 'authModal') {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projects - DesignEase</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* --- 1. SHARED CSS (Variables & Layout) --- */
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-soft: #e0e7ff;
+            --accent: #d946ef;
+            --danger: #ef4444;
+            --success: #10b981;
+            
+            --bg-body: #f8fafc;
+            --bg-sidebar: #ffffff;
+            
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            
+            --sidebar-width: 260px;
+            
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 25px -3px rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            
+            --gradient-magic: linear-gradient(135deg, #6366f1 0%, #d946ef 100%);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
+        button { border: none; outline: none; background: none; font-family: inherit; cursor: pointer; }
+
+        /* --- 2. SIDEBAR (Exact Match from Request) --- */
+        .sidebar {
+            position: fixed; top: 0; left: 0; width: var(--sidebar-width); height: 100vh;
+            background: var(--bg-sidebar); border-right: 1px solid var(--border);
+            display: flex; flex-direction: column; z-index: 50; padding: 1.5rem 1rem;
+            transition: transform 0.3s ease;
+        }
+
+        .logo { font-size: 1.5rem; font-weight: 800; background: var(--gradient-magic); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .sidebar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding: 0 0.5rem; }
+        
+        .create-btn {
+            width: 100%; padding: 0.75rem; background: var(--primary); color: white; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: var(--shadow-sm); margin-bottom: 1.5rem; transition: all 0.2s;
+        }
+        .create-btn:hover { background: var(--primary-dark); transform: translateY(-1px); }
+
+        .nav-list { flex: 1; overflow-y: auto; }
+        .nav-item { margin-bottom: 4px; }
+        .nav-link { display: flex; align-items: center; gap: 12px; padding: 0.6rem 0.8rem; color: var(--text-muted); border-radius: 8px; font-weight: 500; font-size: 0.95rem; transition: all 0.2s; }
+        .nav-link:hover { background: #f1f5f9; color: var(--primary); }
+        .nav-link.active { background: #e0e7ff; color: var(--primary); font-weight: 600; }
+        .nav-divider { height: 1px; background: var(--border); margin: 1rem 0; }
+        .nav-label { font-size: 0.75rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted); margin: 0 0 0.5rem 0.8rem; }
+        
+        .sidebar-footer { margin-top: auto; padding-top: 1rem; border-top: 1px solid var(--border); }
+        .user-card { display: flex; align-items: center; gap: 10px; padding: 0.5rem; border-radius: 8px; cursor: pointer; transition: background 0.2s; }
+        .user-card:hover { background: #f8fafc; }
+        .user-avatar { width: 36px; height: 36px; background: #e2e8f0; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.8rem; color: var(--text-main); }
+        .user-info h4 { font-size: 0.9rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px; }
+        .user-info p { font-size: 0.75rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px; }
+        .logout-btn { margin-left: auto; color: var(--text-muted); cursor: pointer; padding: 5px; }
+        .logout-btn:hover { color: #ef4444; }
+
+        /* --- 3. MAIN WRAPPER --- */
+        .main-wrapper {
+            margin-left: var(--sidebar-width);
+            width: calc(100% - var(--sidebar-width));
+            display: flex; flex-direction: column;
+        }
+
+        .top-header {
+            position: sticky; top: 0; background: rgba(248, 250, 252, 0.8); backdrop-filter: blur(10px); padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; z-index: 40; border-bottom: 1px solid var(--border);
+        }
+
+        .header-search { position: relative; width: 400px; display: none; }
+        .header-search input { width: 100%; padding: 0.6rem 1rem 0.6rem 2.5rem; border: 1px solid var(--border); border-radius: 8px; font-size: 0.9rem; background: white; }
+        .header-search i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+
+        .header-actions { display: flex; align-items: center; gap: 1rem; }
+        .action-btn-secondary {
+            padding: 0.5rem 1rem; border-radius: 8px; border: 1px solid var(--border); background: white; color: var(--text-main); font-weight: 600; font-size: 0.9rem; transition: 0.2s;
+        }
+        .action-btn-secondary:hover { background: #f8fafc; border-color: var(--text-muted); }
+        
+        .action-btn-primary {
+            padding: 0.5rem 1rem; border-radius: 8px; background: var(--primary); color: white; font-weight: 600; font-size: 0.9rem; transition: 0.2s; box-shadow: var(--shadow-sm);
+        }
+        .action-btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
+
+        /* --- 4. PROJECTS UI --- */
+        .dashboard-content { padding: 2rem; max-width: 1400px; margin: 0 auto; width: 100%; }
+
+        /* Visual Stats Header */
+        .projects-hero {
+            display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem;
+            padding-bottom: 1rem; border-bottom: 1px solid var(--border);
+        }
+        .hero-text h1 { font-size: 2rem; font-weight: 800; color: var(--text-main); margin-bottom: 5px; }
+        .hero-text p { color: var(--text-muted); }
+
+        .folders-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1.5rem; }
+        
+        .folder-card {
+            background: white; border: 1px solid var(--border); border-radius: 16px;
+            padding: 1.5rem; display: flex; flex-direction: column; position: relative;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; overflow: hidden;
+        }
+        .folder-card::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px;
+            background: var(--border); transition: 0.3s;
+        }
+        .folder-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-lg); border-color: var(--primary-soft); }
+        .folder-card:hover::before { background: var(--primary); }
+
+        .folder-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; }
+        .f-icon { 
+            width: 48px; height: 48px; background: #fff7ed; color: #f59e0b; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center; font-size: 1.5rem;
+        }
+        
+        .f-options {
+            width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            color: var(--text-muted); transition: 0.2s;
+        }
+        .f-options:hover { background: #f1f5f9; color: var(--primary); }
+
+        .f-title { font-weight: 700; font-size: 1.1rem; color: var(--text-main); margin-bottom: 0.25rem; }
+        .f-meta { font-size: 0.8rem; color: var(--text-muted); }
+        
+        .f-footer { margin-top: auto; padding-top: 1rem; display: flex; justify-content: space-between; align-items: center; }
+        .shared-badge { 
+            background: #e0e7ff; color: var(--primary); padding: 4px 10px; border-radius: 20px; 
+            font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+
+        /* --- 5. ATTRACTIVE MODALS --- */
+        .modal-overlay {
+            position: fixed; inset: 0; z-index: 1000;
+            background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(8px);
+            display: none; justify-content: center; align-items: center;
+            opacity: 0; transition: opacity 0.3s ease;
+        }
+        .modal-overlay.active { display: flex; opacity: 1; }
+
+        .modal-box {
+            background: white; width: 90%; max-width: 480px; border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+            transform: scale(0.95); transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            overflow: hidden;
+        }
+        .modal-overlay.active .modal-box { transform: scale(1); }
+
+        /* Captivating Header */
+        .modal-hero {
+            padding: 2.5rem 2rem 1.5rem; text-align: center;
+            background: radial-gradient(circle at 50% -20%, #e0e7ff 0%, #fff 70%);
+        }
+        .mh-icon {
+            width: 64px; height: 64px; background: white; border-radius: 20px;
+            display: inline-flex; align-items: center; justify-content: center;
+            font-size: 1.8rem; color: var(--primary);
+            box-shadow: 0 10px 25px rgba(99, 102, 241, 0.2); margin-bottom: 1.2rem; transform: rotate(-5deg);
+        }
+        .mh-title { font-size: 1.5rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.5rem; }
+        .mh-desc { font-size: 0.95rem; color: var(--text-muted); line-height: 1.5; }
+
+        .modal-body { padding: 0 2rem 2.5rem; }
+
+        /* Inputs */
+        .float-input-group { position: relative; margin-bottom: 1.5rem; }
+        .float-input {
+            width: 100%; padding: 16px; border: 2px solid var(--border); border-radius: 12px;
+            font-size: 1rem; outline: none; transition: 0.2s; background: #f8fafc; color: var(--text-main);
+        }
+        .float-input:focus { border-color: var(--primary); background: white; box-shadow: 0 0 0 4px var(--primary-soft); }
+        .float-label {
+            position: absolute; left: 16px; top: 18px; color: var(--text-muted); pointer-events: none; transition: 0.2s;
+        }
+        .float-input:focus ~ .float-label, .float-input:not(:placeholder-shown) ~ .float-label {
+            transform: translateY(-28px); font-size: 0.85rem; color: var(--primary); font-weight: 700;
+        }
+
+        /* Buttons */
+        .btn-block { width: 100%; padding: 16px; border-radius: 12px; font-weight: 700; font-size: 1rem; cursor: pointer; transition: 0.2s; margin-top: 10px; }
+        .btn-submit { background: var(--primary); color: white; border: none; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3); }
+        .btn-submit:hover { background: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4); }
+        .btn-ghost { background: transparent; border: none; color: var(--text-muted); margin-top: 10px; }
+        .btn-ghost:hover { color: var(--text-main); background: #f1f5f9; }
+
+        /* Access Ticket */
+        .access-ticket {
+            background: var(--text-main); color: white; border-radius: 16px; padding: 2rem;
+            text-align: center; position: relative; margin-bottom: 1.5rem;
+            background-image: radial-gradient(circle at 0 50%, transparent 10px, var(--text-main) 11px),
+                              radial-gradient(circle at 100% 50%, transparent 10px, var(--text-main) 11px);
+            background-size: 51% 100%; background-position: 0 0, 100% 0; background-repeat: no-repeat;
+            border: 2px dashed rgba(255,255,255,0.2);
+        }
+        .ticket-code { font-family: monospace; font-size: 2.5rem; letter-spacing: 6px; font-weight: 700; color: var(--accent); margin: 10px 0; }
+        
+        /* Access List */
+        .acl-container { max-height: 200px; overflow-y: auto; border: 1px solid var(--border); border-radius: 12px; margin-top: 1rem; }
+        .acl-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--border); background: white; }
+        .acl-user { display: flex; align-items: center; gap: 12px; }
+        .acl-av { width: 36px; height: 36px; border-radius: 50%; background: var(--primary-soft); color: var(--primary); font-weight: 700; display: flex; align-items: center; justify-content: center; }
+        .acl-btn { font-size: 0.75rem; font-weight: 700; color: var(--danger); background: #fee2e2; padding: 6px 12px; border-radius: 6px; cursor: pointer; transition: 0.2s; }
+        .acl-btn:hover { background: var(--danger); color: white; }
+
+        /* Toast */
+        .toast-box { position: fixed; top: 20px; right: 20px; z-index: 2000; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+        .toast { pointer-events: auto; background: white; padding: 1rem; border-radius: 12px; box-shadow: var(--shadow-xl); border-left: 5px solid; display: flex; align-items: center; gap: 15px; width: 340px; animation: slideIn 0.3s ease; }
+        .t-success { border-color: var(--success); } .t-error { border-color: var(--danger); }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+        /* Responsive */
+        @media (min-width: 1024px) { .header-search { display: block; } }
+        @media (max-width: 768px) {
+            :root { --sidebar-width: 0px; }
+            .sidebar { transform: translateX(-100%); width: 260px; }
+            .sidebar.active { transform: translateX(0); box-shadow: 10px 0 20px rgba(0,0,0,0.1); }
+            .mobile-menu-toggle { display: block; }
+            .close-sidebar-btn { display: block; }
+        }
+        .mobile-menu-toggle { display: none; font-size: 1.5rem; cursor: pointer; margin-right: 1rem; }
+        .close-sidebar-btn { display: none; cursor: pointer; color: var(--text-muted); }
+    </style>
+</head>
+<body>
+
+    <div class="toast-box" id="toastBox"></div>
+
+    <div class="modal-overlay" id="createModal">
+        <div class="modal-box">
+            <div class="modal-hero">
+                <div class="mh-icon"><i class="fa-solid fa-folder-plus"></i></div>
+                <h3 class="mh-title">Create Workspace</h3>
+                <p class="mh-desc">Organize your assets. This folder will be synced to your MongoDB Atlas database.</p>
+            </div>
+            <div class="modal-body">
+                <div class="float-input-group">
+                    <input type="text" id="newFolderName" class="float-input" placeholder=" " autocomplete="off">
+                    <label class="float-label">Project Name</label>
+                </div>
+                <button class="btn-block btn-submit" onclick="Logic.createFolder()">Create Folder</button>
+                <button class="btn-block btn-ghost" onclick="UIManager.closeModal('createModal')">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="accessModal">
+        <div class="modal-box">
+            <div class="modal-hero">
+                <div class="mh-icon"><i class="fa-solid fa-users-gear"></i></div>
+                <h3 class="mh-title">Manage Access</h3>
+                <p class="mh-desc">Control who views this workspace.</p>
+            </div>
+            <div class="modal-body">
+                <button class="btn-block btn-submit" onclick="Logic.generateCode()" style="margin-bottom: 1.5rem; background: var(--text-main);">
+                    <i class="fa-solid fa-key"></i> Generate Access Code
+                </button>
+
+                <div id="codeContainer" style="display:none;">
+                    <div class="access-ticket">
+                        <div style="text-transform:uppercase; font-size:0.8rem; opacity:0.8;">One-Time Password</div>
+                        <div class="ticket-code" id="displayCode">---</div>
+                        <div style="font-size:0.75rem;">Expires after single use</div>
+                    </div>
+                </div>
+
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                    <span style="font-weight:700; color:var(--text-main);">Shared Users</span>
+                    <span style="font-size:0.8rem; color:var(--text-muted);" id="userCount">0 users</span>
+                </div>
+                
+                <div class="acl-container" id="accessListContent">
+                    </div>
+
+                <button class="btn-block btn-ghost" onclick="UIManager.closeModal('accessModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="joinModal">
+        <div class="modal-box">
+            <div class="modal-hero">
+                <div class="mh-icon"><i class="fa-solid fa-ticket"></i></div>
+                <h3 class="mh-title">Redeem Access</h3>
+                <p class="mh-desc">Enter the 6-character code shared with you to unlock the folder.</p>
+            </div>
+            <div class="modal-body">
+                <div class="float-input-group">
+                    <input type="text" id="joinCode" class="float-input" placeholder=" " autocomplete="off" style="text-align:center; letter-spacing:4px; font-weight:800; font-size:1.2rem; text-transform:uppercase;">
+                    <label class="float-label" style="left:50%; transform:translateX(-50%);">Enter Code</label>
+                </div>
+                <button class="btn-block btn-submit" onclick="Logic.redeemCode()">Unlock Folder</button>
+                <button class="btn-block btn-ghost" onclick="UIManager.closeModal('joinModal')">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="index.html" class="logo">Design<span>Ease</span></a>
+            <i class="fa-solid fa-xmark close-sidebar-btn" onclick="toggleSidebar()"></i>
+        </div>
+
+        <div class="create-btn-container">
+            <button class="create-btn" onclick="location.href='editor.html'">
+                <i class="fa-solid fa-plus"></i> Create a design
+            </button>
+        </div>
+
+        <ul class="nav-list">
+            <li class="nav-item"><a href="home.html" class="nav-link"><i class="fa-solid fa-house"></i> Home</a></li>
+            <li class="nav-item"><a href="projects.html" class="nav-link active"><i class="fa-solid fa-folder-open"></i> Projects</a></li>
+            <li class="nav-item"><a href="templates.html" class="nav-link"><i class="fa-solid fa-layer-group"></i> Templates</a></li>
+            <li class="nav-divider"></li>
+            <li class="nav-label">Tools</li>
+            <li class="nav-item"><a href="ai-generator.html" class="nav-link"><i class="fa-solid fa-robot"></i> AI Image Gen</a></li>
+            <li class="nav-item"><a href="content-planner.html" class="nav-link"><i class="fa-solid fa-calendar-days"></i> Content Planner</a></li>
+            <li class="nav-divider"></li>
+            <li class="nav-label">Team</li>
+            <li class="nav-item"><a href="invite.html" class="nav-link"><i class="fa-solid fa-users"></i> Invite Members</a></li>
+            <li class="nav-item"><a href="settings.html" class="nav-link"><i class="fa-solid fa-gear"></i> Settings</a></li>
+            <li class="nav-item"><a href="trash.html" class="nav-link"><i class="fa-solid fa-trash"></i> Trash</a></li>
+        </ul>
+
+        <div class="sidebar-footer">
+            <div class="user-card">
+                <div class="user-avatar" id="userAvatar">G</div>
+                <div class="user-info">
+                    <h4 id="userName">Guest</h4>
+                    <p id="userEmail">Login required</p>
+                </div>
+                <div class="logout-btn" onclick="SessionManager.logout()"><i class="fa-solid fa-right-from-bracket"></i></div>
+            </div>
+        </div>
+    </aside>
+
+    <div class="main-wrapper">
+        <header class="top-header">
+            <div style="display: flex; align-items: center; width: 100%;">
+                <i class="fa-solid fa-bars mobile-menu-toggle" onclick="toggleSidebar()"></i>
+                <div class="header-search">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" placeholder="Search projects & folders...">
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="action-btn-secondary" onclick="UIManager.openModal('joinModal')">
+                    <i class="fa-solid fa-ticket"></i> Redeem Code
+                </button>
+                <button class="action-btn-primary" onclick="UIManager.openModal('createModal')">
+                    <i class="fa-solid fa-plus"></i> New Folder
+                </button>
+            </div>
+        </header>
+
+        <div class="dashboard-content">
+            <div class="projects-hero">
+                <div class="hero-text">
+                    <h1>My Workspace</h1>
+                    <p>Manage your design assets and shared collaborations.</p>
+                </div>
+            </div>
+
+            <div class="folders-grid" id="foldersGrid">
+                <div style="grid-column:1/-1; padding:3rem; text-align:center; color:var(--text-muted); border:2px dashed var(--border); border-radius:16px;">
+                    <i class="fa-solid fa-spinner fa-spin" style="font-size:2rem; margin-bottom:1rem;"></i>
+                    <p>Connecting to Server...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5000/api';
+
+        // --- 1. API SERVICE (Backend Connection) ---
+        const API = {
+            async getFolders(email) {
+                try {
+                    const res = await fetch(`${API_URL}/folders?email=${email}`);
+                    return await res.json();
+                } catch(e) { return null; }
+            },
+            async createFolder(name, owner) {
+                const res = await fetch(`${API_URL}/folders`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, owner })
+                });
+                return res.json();
+            },
+            async generateCode(folderId) {
+                const res = await fetch(`${API_URL}/generate-code`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ folderId })
+                });
+                return res.json();
+            },
+            async redeemCode(code, email) {
+                const res = await fetch(`${API_URL}/redeem-code`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ code, email })
+                });
+                return res.json();
+            },
+            async getAccessList(folderId) {
+                const res = await fetch(`${API_URL}/folders/${folderId}/access`);
+                return res.json();
+            },
+            async revokeAccess(folderId, emailToRemove) {
+                const res = await fetch(`${API_URL}/revoke-access`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ folderId, emailToRemove })
+                });
+                return res.json();
+            }
+        };
+
+        // --- 2. SESSION MANAGER ---
+        const SessionManager = {
+            currentUser: null,
+            init() {
+                let userStr = localStorage.getItem('user');
+                if (!userStr) {
+                    const defaultUser = { name: "Guest User", email: "guest@example.com" };
+                    localStorage.setItem('user', JSON.stringify(defaultUser));
+                    this.currentUser = defaultUser;
+                } else {
+                    this.currentUser = JSON.parse(userStr);
+                }
+                this.updateUI();
+            },
+            updateUI() {
+                document.getElementById('userName').textContent = this.currentUser.name;
+                document.getElementById('userEmail').textContent = this.currentUser.email;
+                document.getElementById('userAvatar').textContent = this.currentUser.name.substring(0,2).toUpperCase();
+            },
+            logout() {
+                // User Switch Simulation for Testing
+                if(this.currentUser.email === "guest@example.com") {
+                    const u = { name: "Alice Dev", email: "alice@dev.com" };
+                    localStorage.setItem('user', JSON.stringify(u));
+                    alert("Switched to: Alice Dev");
+                } else {
+                    const u = { name: "Guest User", email: "guest@example.com" };
+                    localStorage.setItem('user', JSON.stringify(u));
+                    alert("Switched to: Guest User");
+                }
+                location.reload();
+            }
+        };
+
+        // --- 3. UI MANAGER ---
+        const UIManager = {
+            activeFolderId: null,
+
+            showToast(msg, type='success') {
+                const box = document.getElementById('toastBox');
+                const t = document.createElement('div');
+                t.className = `toast ${type === 'success' ? 't-success' : 't-error'}`;
+                t.innerHTML = `
+                    <div style="font-size:1.5rem; color:${type==='success'?'var(--success)':'var(--danger)'}">
+                        <i class="fa-solid ${type==='success'?'fa-circle-check':'fa-circle-exclamation'}"></i>
+                    </div>
+                    <div>
+                        <h4 style="font-size:0.9rem; font-weight:700; margin-bottom:2px;">${type==='success'?'Success':'Error'}</h4>
+                        <p style="font-size:0.8rem; color:var(--text-muted);">${msg}</p>
+                    </div>
+                `;
+                box.appendChild(t);
+                setTimeout(() => t.remove(), 4000);
+            },
+
+            openModal(id, folderId = null) {
+                document.getElementById(id).classList.add('active');
+                if(folderId) {
+                    this.activeFolderId = folderId;
+                    this.renderAccessList(folderId);
+                }
+                document.getElementById('codeContainer').style.display = 'none';
+                document.getElementById('newFolderName').value = '';
+                document.getElementById('joinCode').value = '';
+            },
+            closeModal(id) {
+                document.getElementById(id).classList.remove('active');
+                this.activeFolderId = null;
+            },
+
+            async renderFolders() {
+                const grid = document.getElementById('foldersGrid');
+                const folders = await API.getFolders(SessionManager.currentUser.email);
+
+                if(!folders) {
+                    grid.innerHTML = `<div style="grid-column:1/-1; padding:2rem; text-align:center; color:var(--danger); border:2px dashed var(--border); border-radius:16px;">
+                        <i class="fa-solid fa-server" style="font-size:2rem; margin-bottom:10px;"></i><br>
+                        Error connecting to Server.<br>Make sure server.js is running.
+                    </div>`;
+                    return;
+                }
+
+                if(folders.length === 0) {
+                    grid.innerHTML = `<div style="grid-column:1/-1; padding:3rem; text-align:center; color:var(--text-muted); border:2px dashed var(--border); border-radius:16px;">
+                        No folders found. Create one to get started.
+                    </div>`;
+                    return;
+                }
+
+                grid.innerHTML = '';
+                folders.forEach(f => {
+                    const isOwner = f.owner === SessionManager.currentUser.email;
+                    const sharedTag = !isOwner ? `<div class="shared-badge">Shared</div>` : '';
+                    
+                    const settingsBtn = isOwner ? 
+                        `<div class="f-options" onclick="event.stopPropagation(); UIManager.openModal('accessModal', '${f._id}')">
+                            <i class="fa-solid fa-gear"></i>
+                        </div>` : '';
+
+                    const el = document.createElement('div');
+                    el.className = 'folder-card';
+                    el.innerHTML = `
+                        <div class="folder-top">
+                            <div class="f-icon"><i class="fa-regular fa-folder-open"></i></div>
+                            ${settingsBtn}
+                        </div>
+                        <div class="f-title">${f.name}</div>
+                        <div class="f-meta">Created: ${new Date(f.createdAt).toLocaleDateString()}</div>
+                        <div class="f-footer">
+                            <div style="font-size:0.75rem; color:var(--text-muted);">
+                                ${isOwner ? 'Owner' : 'Viewer'}
+                            </div>
+                            ${sharedTag}
+                        </div>
+                    `;
+                    grid.appendChild(el);
+                });
+            },
+
+            async renderAccessList(folderId) {
+                const list = document.getElementById('accessListContent');
+                list.innerHTML = '<div style="padding:1rem; text-align:center; color:grey;">Loading...</div>';
+                
+                const data = await API.getAccessList(folderId);
+                list.innerHTML = '';
+
+                // Count
+                document.getElementById('userCount').innerText = `${data.acl.length + 1} users`;
+
+                // Owner Row
+                list.innerHTML += `
+                    <div class="acl-item">
+                        <div class="acl-user">
+                            <div class="acl-av" style="background:#f1f5f9; color:var(--text-muted);">OW</div>
+                            <div>
+                                <div style="font-weight:700; font-size:0.9rem;">${data.owner}</div>
+                                <div style="font-size:0.7rem; color:var(--text-muted);">Owner</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                if(data.acl.length === 0) {
+                    list.innerHTML += `<div style="text-align:center; padding:1rem; color:var(--text-muted); font-size:0.8rem;">No shared users yet.</div>`;
+                } else {
+                    data.acl.forEach(email => {
+                        const row = document.createElement('div');
+                        row.className = 'acl-item';
+                        row.innerHTML = `
+                            <div class="acl-user">
+                                <div class="acl-av">${email.substring(0,2).toUpperCase()}</div>
+                                <div>
+                                    <div style="font-weight:700; font-size:0.9rem;">${email}</div>
+                                    <div style="font-size:0.7rem; color:var(--text-muted);">Viewer</div>
+                                </div>
+                            </div>
+                            <div class="acl-btn" onclick="Logic.revoke('${folderId}', '${email}')">Revoke</div>
+                        `;
+                        list.appendChild(row);
+                    });
+                }
+            }
+        };
+
+        // --- 4. LOGIC HANDLERS ---
+        const Logic = {
+            async createFolder() {
+                const name = document.getElementById('newFolderName').value.trim();
+                if(!name) return UIManager.showToast("Enter a folder name", "error");
+                
+                await API.createFolder(name, SessionManager.currentUser.email);
+                UIManager.showToast("Workspace Created");
+                UIManager.closeModal('createModal');
+                UIManager.renderFolders();
+            },
+            async generateCode() {
+                const data = await API.generateCode(UIManager.activeFolderId);
+                document.getElementById('displayCode').textContent = data.code;
+                document.getElementById('codeContainer').style.display = 'block';
+                UIManager.showToast("Code Generated");
+            },
+            async redeemCode() {
+                const code = document.getElementById('joinCode').value.trim();
+                if(!code) return UIManager.showToast("Enter a code", "error");
+
+                const res = await API.redeemCode(code, SessionManager.currentUser.email);
+                if(res.success) {
+                    UIManager.showToast(res.msg);
+                    UIManager.closeModal('joinModal');
+                    UIManager.renderFolders();
+                } else {
+                    UIManager.showToast(res.msg, "error");
+                }
+            },
+            async revoke(fid, email) {
+                if(confirm("Revoke access for this user?")) {
+                    await API.revokeAccess(fid, email);
+                    UIManager.renderAccessList(fid);
+                    UIManager.showToast("Access Revoked");
+                }
+            }
+        };
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+        }
+
+        // INIT
+        document.addEventListener('DOMContentLoaded', () => {
+            SessionManager.init();
+            UIManager.renderFolders();
+        });
+    </script>
+</body>
+</html>

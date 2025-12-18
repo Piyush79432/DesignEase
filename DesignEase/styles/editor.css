@@ -1,0 +1,379 @@
+/* Editor specific styles */
+body.editor-page {
+  overflow: hidden;
+}
+
+.editor-container {
+  display: flex;
+  height: 100vh;
+  background: #f8f9fa;
+}
+
+/* Left Toolbar */
+.editor-sidebar {
+  width: 80px;
+  background: #fff;
+  border-right: 1px solid #e1e4e8;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 0;
+  gap: 10px;
+}
+
+.tool-btn {
+  width: 50px;
+  height: 50px;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  transition: var(--transition);
+  color: var(--text-gray);
+}
+
+.tool-btn i {
+  font-size: 1.3rem;
+}
+
+.tool-btn span {
+  font-size: 0.65rem;
+  font-weight: 600;
+}
+
+.tool-btn:hover,
+.tool-btn.active {
+  background: #f0ebff;
+  color: var(--primary);
+}
+
+/* Editor Main Area */
+.editor-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.editor-header {
+  height: 64px;
+  background: #fff;
+  border-bottom: 1px solid #e1e4e8;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+}
+
+.editor-title {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.editor-title input {
+  border: none;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 8px 12px;
+  border-radius: 6px;
+  outline: none;
+}
+
+.editor-title input:hover {
+  background: #f6f7f9;
+}
+
+.editor-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.control-group {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0 10px;
+  border-left: 1px solid #e1e4e8;
+}
+
+.ctrl-btn {
+  width: 36px;
+  height: 36px;
+  border: 1px solid #e1e4e8;
+  background: #fff;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+}
+
+.ctrl-btn:hover {
+  background: #f6f7f9;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.btn-primary:hover {
+  background: var(--primary-hover);
+}
+
+/* Canvas Area */
+.canvas-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8f9fa;
+  overflow: auto;
+  padding: 40px;
+}
+
+.canvas-wrapper {
+  background: white;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+#designCanvas {
+  display: block;
+  cursor: crosshair;
+}
+
+/* Right Properties Panel */
+.properties-panel {
+  width: 320px;
+  background: #fff;
+  border-left: 1px solid #e1e4e8;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.properties-panel.hidden {
+  display: none;
+}
+
+.prop-section {
+  margin-bottom: 30px;
+}
+
+.prop-section h3 {
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin-bottom: 15px;
+  color: var(--text-dark);
+}
+
+.prop-row {
+  margin-bottom: 15px;
+}
+
+.prop-row label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-gray);
+  margin-bottom: 8px;
+}
+
+.prop-row input,
+.prop-row select {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #e1e4e8;
+  border-radius: 6px;
+  font-family: var(--font-main);
+  font-size: 0.9rem;
+}
+
+.color-picker-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.color-picker-row input[type="color"] {
+  width: 50px;
+  height: 38px;
+  border: none;
+  cursor: pointer;
+}
+
+.slider-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.slider-row input[type="range"] {
+  flex: 1;
+}
+
+.slider-row span {
+  min-width: 40px;
+  text-align: right;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+/* Tool Panels */
+.tool-panel {
+  display: none;
+  width: 300px;
+  background: #fff;
+  border-right: 1px solid #e1e4e8;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.tool-panel.active {
+  display: block;
+}
+
+.tool-panel h2 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.template-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+}
+
+.template-item {
+  background: #f6f7f9;
+  border-radius: 8px;
+  padding: 10px;
+  cursor: pointer;
+  transition: var(--transition);
+  text-align: center;
+}
+
+.template-item:hover {
+  background: #e1e4e8;
+  transform: scale(1.05);
+}
+
+.template-item img {
+  width: 100%;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 6px;
+  margin-bottom: 8px;
+}
+
+.template-item span {
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.upload-area {
+  border: 2px dashed #e1e4e8;
+  border-radius: 8px;
+  padding: 40px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.upload-area:hover {
+  border-color: var(--primary);
+  background: #f9f8ff;
+}
+
+.upload-area i {
+  font-size: 3rem;
+  color: var(--primary);
+  margin-bottom: 10px;
+}
+
+.shapes-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.shape-item {
+  aspect-ratio: 1;
+  background: #f6f7f9;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.shape-item:hover {
+  background: var(--primary);
+  color: white;
+}
+
+.shape-item i {
+  font-size: 2rem;
+}
+
+/* Layers Panel */
+.layers-list {
+  list-style: none;
+}
+
+.layer-item {
+  padding: 10px;
+  background: #f6f7f9;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.layer-item:hover {
+  background: #e1e4e8;
+}
+
+.layer-item.active {
+  background: #f0ebff;
+  border: 2px solid var(--primary);
+}
+
+.layer-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.layer-actions {
+  display: flex;
+  gap: 5px;
+}
+
+.layer-actions i {
+  cursor: pointer;
+  padding: 5px;
+  color: var(--text-gray);
+}
+
+.layer-actions i:hover {
+  color: var(--primary);
+}

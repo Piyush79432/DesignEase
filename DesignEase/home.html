@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - DesignEase</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    
+    <style>
+        :root { 
+            --primary: #6366f1; 
+            --primary-dark: #4f46e5; 
+            --accent: #d946ef; 
+            --bg-body: #f8fafc; 
+            --bg-sidebar: #ffffff; 
+            --text-main: #0f172a; 
+            --text-muted: #64748b; 
+            --border: #e2e8f0; 
+            --sidebar-width: 260px; 
+            --gradient-magic: linear-gradient(135deg, #6366f1 0%, #d946ef 100%); 
+            --gradient-hero: linear-gradient(120deg, #4f46e5, #9333ea); 
+            --danger: #ef4444;
+            --success: #10b981;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background-color: var(--bg-body); color: var(--text-main); display: flex; min-height: 100vh; }
+        a { text-decoration: none; color: inherit; } 
+        ul { list-style: none; } 
+        button { border: none; outline: none; background: none; font-family: inherit; }
+        
+        /* --- SIDEBAR --- */
+        .sidebar { position: fixed; top: 0; left: 0; width: var(--sidebar-width); height: 100vh; background: var(--bg-sidebar); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 50; padding: 1.5rem 1rem; transition: transform 0.3s ease; }
+        .logo { font-size: 1.5rem; font-weight: 800; background: var(--gradient-magic); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .sidebar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding: 0 0.5rem; }
+        .create-btn { width: 100%; padding: 0.75rem; background: var(--primary); color: white; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 1.5rem; transition: all 0.2s; }
+        .create-btn:hover { background: var(--primary-dark); transform: translateY(-1px); }
+        .nav-list { flex: 1; overflow-y: auto; }
+        .nav-item { margin-bottom: 4px; }
+        .nav-link { display: flex; align-items: center; gap: 12px; padding: 0.6rem 0.8rem; color: var(--text-muted); border-radius: 8px; font-weight: 500; font-size: 0.95rem; transition: all 0.2s; }
+        .nav-link:hover { background: #f1f5f9; color: var(--primary); }
+        .nav-link.active { background: #e0e7ff; color: var(--primary); font-weight: 600; }
+        .nav-divider { height: 1px; background: var(--border); margin: 1rem 0; }
+        .nav-label { font-size: 0.75rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted); margin: 0 0 0.5rem 0.8rem; }
+        
+        .sidebar-footer { margin-top: auto; padding-top: 1rem; border-top: 1px solid var(--border); }
+        .user-card { display: flex; align-items: center; gap: 10px; padding: 0.5rem; border-radius: 8px; transition: background 0.2s; }
+        .user-card:hover { background: #f8fafc; }
+        .user-avatar { width: 36px; height: 36px; background: #e2e8f0; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.8rem; color: var(--text-main); }
+        .user-info h4 { font-size: 0.9rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 110px; }
+        .user-info p { font-size: 0.75rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 110px; }
+        .logout-btn { margin-left: auto; color: var(--text-muted); cursor: pointer; padding: 6px; border-radius: 6px; transition: 0.2s; }
+        .logout-btn:hover { background: #fee2e2; color: #ef4444; }
+
+        /* --- MAIN CONTENT --- */
+        .main-wrapper { margin-left: var(--sidebar-width); width: calc(100% - var(--sidebar-width)); display: flex; flex-direction: column; background: linear-gradient(to bottom, #f8fafc 0%, #f1f5f9 100%); }
+        .top-header { position: sticky; top: 0; background: rgba(248, 250, 252, 0.8); backdrop-filter: blur(10px); padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; z-index: 40; border-bottom: 1px solid var(--border); }
+        
+        /* SEARCH BAR */
+        .header-search { position: relative; width: 350px; margin-left: 2rem; }
+        .header-search input { width: 100%; padding: 0.6rem 1rem 0.6rem 2.5rem; border: 1px solid var(--border); border-radius: 20px; font-size: 0.9rem; background: white; transition: 0.2s; }
+        .header-search input:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); }
+        .header-search i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+        
+        /* Search Dropdown */
+        .search-results { position: absolute; top: 110%; left: 0; width: 100%; background: white; border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); display: none; z-index: 100; max-height: 300px; overflow-y: auto; }
+        .search-results.active { display: block; }
+        .search-item { padding: 10px 15px; display: flex; align-items: center; gap: 10px; cursor: pointer; border-bottom: 1px solid #f1f5f9; transition: 0.2s; }
+        .search-item:hover { background: #f8fafc; color: var(--primary); }
+        .search-item:last-child { border-bottom: none; }
+        .search-item i { position: static; transform: none; color: var(--text-muted); font-size: 0.9rem; }
+
+        .header-actions { display: flex; align-items: center; gap: 1rem; margin-left: auto; }
+        .upgrade-btn { background: var(--gradient-magic); color: white; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 6px; cursor: pointer; transition: 0.2s; }
+        .upgrade-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+        .icon-btn { width: 36px; height: 36px; border-radius: 50%; background: white; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; color: var(--text-muted); cursor: pointer; transition: all 0.2s; position: relative; }
+        .icon-btn:hover { background: #f1f5f9; color: var(--text-main); }
+        
+        /* NOTIFICATION POPUP */
+        .notif-badge { position: absolute; top: -2px; right: -2px; width: 10px; height: 10px; background: var(--danger); border-radius: 50%; border: 2px solid white; display: none; }
+        .notif-badge.active { display: block; }
+        
+        .notif-popup {
+            position: absolute; top: 50px; right: 20px; width: 320px; background: white;
+            border: 1px solid var(--border); border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            z-index: 100; display: none; flex-direction: column; animation: slideIn 0.2s ease;
+        }
+        .notif-popup.show { display: flex; }
+        .notif-header { padding: 12px 16px; border-bottom: 1px solid var(--border); font-weight: 700; font-size: 0.9rem; display: flex; justify-content: space-between; align-items: center; }
+        .notif-body { max-height: 300px; overflow-y: auto; }
+        .notif-empty { padding: 30px; text-align: center; color: var(--text-muted); font-size: 0.9rem; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+        .notif-item { padding: 12px 16px; border-bottom: 1px solid #f1f5f9; display: flex; gap: 10px; align-items: start; transition: 0.2s; cursor: pointer; }
+        .notif-item:hover { background: #f8fafc; }
+        .notif-icon { width: 32px; height: 32px; background: #e0e7ff; border-radius: 50%; color: var(--primary); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 0.8rem; }
+        .notif-text h5 { font-size: 0.85rem; font-weight: 600; margin-bottom: 2px; }
+        .notif-text p { font-size: 0.75rem; color: var(--text-muted); line-height: 1.4; }
+
+        .dashboard-content { padding: 2rem; max-width: 1400px; margin: 0 auto; width: 100%; position: relative; }
+
+        /* HERO & CARDS */
+        .hero-banner { background: var(--gradient-hero); border-radius: 16px; padding: 3rem 2rem; text-align: center; color: white; margin-bottom: 3rem; position: relative; overflow: hidden; }
+        .hero-banner h1 { font-size: 2.5rem; font-weight: 800; margin-bottom: 2rem; letter-spacing: -0.02em; }
+        .quick-actions-grid { display: flex; justify-content: center; gap: 1.5rem; flex-wrap: wrap; }
+        .action-card { display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; transition: transform 0.2s; }
+        .action-card:hover { transform: translateY(-5px); }
+        .action-icon-circle { width: 60px; height: 60px; border-radius: 50%; background: white; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: var(--primary); box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .action-card span { font-size: 0.85rem; font-weight: 600; color: white; }
+
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; margin-top: 2rem; }
+        .section-header h2 { font-size: 1.25rem; font-weight: 700; }
+        .see-all { color: var(--primary); font-size: 0.9rem; font-weight: 600; cursor: pointer; }
+
+        .design-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1.5rem; }
+        .design-card { background: white; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; display: flex; flex-direction: column; position: relative; max-width: 400px; }
+        .design-card:hover { transform: translateY(-6px); box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12); border-color: var(--primary); }
+        
+        .card-preview { height: 200px; background: #f8fafc; overflow: hidden; position: relative; display: flex; align-items: center; justify-content: center; }
+        .card-preview img { width: 100%; height: 100%; object-fit: contain; padding: 10px; display: block; transition: transform 0.3s ease; image-rendering: -webkit-optimize-contrast; }
+        .design-card:hover .card-preview img { transform: scale(1.05); }
+        .card-info { padding: 1rem; }
+        .card-title { font-weight: 600; font-size: 0.95rem; margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .card-meta { font-size: 0.75rem; color: var(--text-muted); display: flex; align-items: center; gap: 6px; font-weight: 500; }
+        .card-actions { position: absolute; top: 8px; right: 8px; display: flex; gap: 6px; opacity: 0; transition: opacity 0.2s; }
+        .design-card:hover .card-actions { opacity: 1; }
+        .card-action-btn { width: 32px; height: 32px; border-radius: 6px; background: white; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-muted); transition: all 0.2s; }
+        .card-action-btn:hover { background: var(--primary); color: white; border-color: var(--primary); }
+        .card-action-btn.danger:hover { background: #ef4444; border-color: #ef4444; }
+
+        /* EMPTY STATE */
+        .empty-state-immersive { grid-column: 1 / -1; background: linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%); border: 2px dashed #cbd5e1; border-radius: 24px; padding: 5rem 2rem; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 450px; }
+        .empty-icon-container { width: 120px; height: 120px; background: #eff6ff; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem; color: var(--primary); font-size: 3.5rem; box-shadow: 0 10px 25px rgba(99, 102, 241, 0.15); animation: float 6s ease-in-out infinite; }
+        .empty-title { font-size: 1.8rem; font-weight: 800; margin-bottom: 1rem; color: var(--text-main); letter-spacing: -0.02em; }
+        .empty-desc { color: var(--text-muted); margin-bottom: 2.5rem; max-width: 450px; line-height: 1.6; font-size: 1rem; }
+        .empty-btn { background: var(--text-main); color: white; padding: 1rem 2.5rem; border-radius: 50px; font-weight: 600; font-size: 1rem; display: inline-flex; align-items: center; gap: 10px; cursor: pointer; box-shadow: 0 4px 15px rgba(15, 23, 42, 0.2); transition: all 0.2s ease; }
+        .empty-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(15, 23, 42, 0.3); background: #1e293b; }
+
+        /* --- UPGRADE / PAYMENT MODAL --- */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; z-index: 2000; animation: fadeIn 0.3s ease; }
+        .modal-overlay.show { display: flex; }
+        
+        .upgrade-modal { background: white; border-radius: 24px; width: 900px; max-width: 95%; max-height: 90vh; overflow-y: auto; display: grid; grid-template-columns: 1fr 1.5fr; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); }
+        .upgrade-visual { background: var(--gradient-hero); padding: 3rem; color: white; display: flex; flex-direction: column; justify-content: center; position: relative; overflow: hidden; }
+        .upgrade-visual::after { content: ''; position: absolute; bottom: -50px; right: -50px; width: 200px; height: 200px; background: rgba(255,255,255,0.1); border-radius: 50%; }
+        .upgrade-visual h2 { font-size: 2.5rem; font-weight: 800; line-height: 1.1; margin-bottom: 1rem; }
+        .upgrade-visual p { opacity: 0.9; font-size: 1.1rem; line-height: 1.6; }
+        
+        .upgrade-content { padding: 3rem; }
+        .plan-card { border: 2px solid var(--border); border-radius: 16px; padding: 1.5rem; margin-bottom: 1rem; cursor: pointer; transition: 0.2s; display: flex; justify-content: space-between; align-items: center; }
+        .plan-card:hover { border-color: var(--primary); background: #f5f3ff; }
+        .plan-card.active { border-color: var(--primary); background: #eef2ff; box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1); }
+        
+        .plan-info h4 { font-size: 1.2rem; margin-bottom: 0.2rem; }
+        .plan-info p { font-size: 0.9rem; color: var(--text-muted); }
+        .plan-price { font-size: 1.5rem; font-weight: 800; color: var(--text-main); }
+        
+        .feature-list { margin: 2rem 0; }
+        .feature-item { display: flex; gap: 10px; align-items: center; margin-bottom: 0.8rem; font-size: 0.95rem; }
+        .feature-item i { color: var(--success); }
+        
+        .pay-btn { width: 100%; padding: 1rem; background: var(--text-main); color: white; border-radius: 12px; font-weight: 700; font-size: 1.1rem; cursor: pointer; border: none; transition: 0.2s; }
+        .pay-btn:hover { background: #1e293b; transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        .close-modal { position: absolute; top: 20px; right: 20px; font-size: 1.5rem; color: white; cursor: pointer; z-index: 10; }
+
+        /* --- SUCCESS POPUP --- */
+        .success-modal { background: white; border-radius: 24px; padding: 3rem; text-align: center; max-width: 400px; position: relative; animation: scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .success-icon { width: 80px; height: 80px; background: #dcfce7; color: var(--success); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; margin: 0 auto 1.5rem; }
+        .success-btn { background: var(--success); color: white; padding: 0.8rem 2rem; border-radius: 30px; font-weight: 600; cursor: pointer; border: none; margin-top: 1.5rem; }
+
+        /* Delete Confirmation Popup Styles (Reused) */
+        .confirm-card { background: white; padding: 2rem; border-radius: 16px; width: 400px; text-align: center; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); transform: scale(0.9); transition: transform 0.3s; }
+        .modal-overlay.show .confirm-card { transform: scale(1); }
+        .confirm-icon { width: 70px; height: 70px; background: #fee2e2; color: #ef4444; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; margin: 0 auto 1.5rem; }
+        .confirm-actions { display: flex; gap: 1rem; justify-content: center; }
+        .c-btn { padding: 0.8rem 1.5rem; border-radius: 10px; font-weight: 600; cursor: pointer; border: none; transition: 0.2s; }
+        .c-btn.cancel { background: #f1f5f9; color: var(--text-main); }
+        .c-btn.delete { background: var(--danger); color: white; }
+
+        /* Keyframes */
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes scaleIn { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
+
+        @media (max-width: 900px) { .upgrade-modal { grid-template-columns: 1fr; } .upgrade-visual { padding: 2rem; } .upgrade-content { padding: 2rem; } .close-modal { color: #333; } }
+        @media (max-width: 768px) { :root { --sidebar-width: 0px; } .sidebar { transform: translateX(-100%); width: 260px; } .sidebar.active { transform: translateX(0); box-shadow: 10px 0 20px rgba(0,0,0,0.1); } .mobile-menu-toggle { display: block; } .close-sidebar-btn { display: block; } .header-search { display: none; } }
+    </style>
+</head>
+<body>
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header"><a href="#" class="logo">Design<span>Ease</span></a><i class="fa-solid fa-xmark close-sidebar-btn" onclick="toggleSidebar()"></i></div>
+        <div class="create-btn-container"><button class="create-btn" onclick="location.href='editor.html'"><i class="fa-solid fa-plus"></i> Create Design</button></div>
+       <ul class="nav-list">
+            <li class="nav-item"><a href="home.html" class="nav-link active"><i class="fa-solid fa-house"></i> Home</a></li>
+            <li class="nav-item"><a href="projects.html" class="nav-link"><i class="fa-solid fa-folder-open"></i> Projects</a></li>
+            <li class="nav-item"><a href="templates.html" class="nav-link"><i class="fa-solid fa-layer-group"></i> Templates</a></li>
+            <li class="nav-divider"></li>
+            <li class="nav-label">Tools</li>
+            <li class="nav-item"><a href="ai-generator.html" class="nav-link"><i class="fa-solid fa-robot"></i> AI Image Gen</a></li>
+            <li class="nav-item"><a href="content-planner.html" class="nav-link"><i class="fa-solid fa-calendar-days"></i> Content Planner</a></li>
+            <li class="nav-divider"></li>
+            <li class="nav-label">Team</li>
+            <li class="nav-item"><a href="invite.html" class="nav-link"><i class="fa-solid fa-users"></i> Invite Members</a></li>
+            <li class="nav-item"><a href="settings.html" class="nav-link"><i class="fa-solid fa-gear"></i> Settings</a></li>
+            <li class="nav-item"><a href="trash.html" class="nav-link"><i class="fa-solid fa-trash"></i> Trash</a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <div class="user-card">
+                <div class="user-avatar" id="userAvatar">G</div>
+                <div class="user-info"><h4 id="userName">Guest</h4><p id="userEmail">Login needed</p></div>
+                <div class="logout-btn" onclick="SessionManager.logout()" title="Logout"><i class="fa-solid fa-right-from-bracket"></i></div>
+            </div>
+        </div>
+    </aside>
+    
+    <div class="main-wrapper">
+        <header class="top-header">
+            <div style="display: flex; align-items: center;">
+                <i class="fa-solid fa-bars mobile-menu-toggle" onclick="toggleSidebar()"></i>
+                <h2 style="font-weight: 700; font-size: 1.25rem;">Home</h2>
+                
+                <div class="header-search">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="globalSearch" placeholder="Search features (e.g., Editor, Projects)..." onkeyup="SearchApp.handleSearch(this.value)">
+                    <div class="search-results" id="searchResults"></div>
+                </div>
+            </div>
+            
+            <div class="header-actions">
+                <div class="upgrade-btn" onclick="PaymentManager.openModal()"><i class="fa-solid fa-bolt"></i> Upgrade</div>
+                
+                <div class="icon-btn" onclick="NotificationManager.toggle()">
+                    <i class="fa-solid fa-bell"></i>
+                    <span class="notif-badge" id="notifBadge"></span>
+                    <div class="notif-popup" id="notifPopup">
+                        <div class="notif-header"><span>Notifications</span> <span style="font-size:0.7rem; color:var(--primary); cursor:pointer;">Mark all read</span></div>
+                        <div class="notif-body" id="notifList">
+                            </div>
+                    </div>
+                </div>
+                
+                <div class="icon-btn"><i class="fa-solid fa-gear"></i></div>
+            </div>
+        </header>
+
+        <div class="dashboard-content">
+            <div class="hero-banner">
+                <h1 id="welcomeMessage">What will you design today?</h1>
+                <div class="quick-actions-grid">
+                    <div class="action-card" onclick="location.href='editor.html'"><div class="action-icon-circle"><i class="fa-solid fa-wand-magic-sparkles"></i></div><span>Magic AI</span></div>
+                    <div class="action-card" onclick="location.href='editor.html'"><div class="action-icon-circle"><i class="fa-solid fa-file-word"></i></div><span>Docs</span></div>
+                    <div class="action-card" onclick="location.href='editor.html'"><div class="action-icon-circle"><i class="fa-solid fa-chalkboard"></i></div><span>Whiteboard</span></div>
+                    <div class="action-card" onclick="location.href='editor.html'"><div class="action-icon-circle"><i class="fa-brands fa-instagram"></i></div><span>Social</span></div>
+                </div>
+            </div>
+
+            <div class="section-header"><h2>My Saved Designs</h2><a class="see-all" href="projects.html">See all</a></div>
+            <div class="design-grid" id="savedDesignsGrid"></div>
+            
+            <div class="section-header"><h2>Recommended Templates</h2><a href="templates.html" class="see-all">See all</a></div>
+            <div class="design-grid" id="recommendedTemplates"></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="upgradeModal">
+        <div class="upgrade-modal">
+            <div class="upgrade-visual">
+                <i class="fa-solid fa-xmark close-sidebar-btn" style="position:absolute; top:20px; left:20px; font-size:1.5rem; color:white; cursor:pointer; display:block;" onclick="PaymentManager.closeModal()"></i>
+                <h2>Unlock Pro<br>Features</h2>
+                <p>Take your designs to the next level with premium tools, unlimited storage, and exclusive templates.</p>
+            </div>
+            <div class="upgrade-content">
+                <h3 style="font-size:1.5rem; font-weight:800; margin-bottom:1.5rem;">Choose your plan</h3>
+                
+                <div class="plan-card active" onclick="PaymentManager.selectPlan(this, 19)">
+                    <div class="plan-info"><h4>Pro Monthly</h4><p>Billed monthly</p></div>
+                    <div class="plan-price">$19</div>
+                </div>
+                <div class="plan-card" onclick="PaymentManager.selectPlan(this, 190)">
+                    <div class="plan-info"><h4>Pro Yearly</h4><p>Save 20%</p></div>
+                    <div class="plan-price">$190</div>
+                </div>
+
+                <div class="feature-list">
+                    <div class="feature-item"><i class="fa-solid fa-check"></i> Unlimited Design Projects</div>
+                    <div class="feature-item"><i class="fa-solid fa-check"></i> Premium AI Image Generator</div>
+                    <div class="feature-item"><i class="fa-solid fa-check"></i> 1TB Cloud Storage</div>
+                    <div class="feature-item"><i class="fa-solid fa-check"></i> Priority Support</div>
+                </div>
+
+                <button class="pay-btn" onclick="PaymentManager.initiatePayment()">Proceed to Pay</button>
+                <div style="text-align:center; margin-top:10px; font-size:0.8rem; color:#94a3b8; cursor:pointer;" onclick="PaymentManager.simulateSuccess()">[Demo: Simulate Success]</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="successModal">
+        <div class="success-modal">
+            <div class="success-icon"><i class="fa-solid fa-check"></i></div>
+            <h2 style="margin-bottom:10px; font-weight:800;">Subscription Active!</h2>
+            <p style="color:#64748b; line-height:1.5;">Thank you for upgrading to Pro. You now have access to all premium features.</p>
+            <button class="success-btn" onclick="document.getElementById('successModal').classList.remove('show')">Start Creating</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="deleteConfirmModal">
+        <div class="confirm-card">
+            <div class="confirm-icon"><i class="fa-solid fa-trash-arrow-up"></i></div>
+            <h3>Move to Trash?</h3>
+            <p>This design will be moved to the trash folder. You can restore it later within 30 days.</p>
+            <div class="confirm-actions">
+                <button class="c-btn cancel" onclick="App.closeDeleteModal()">Cancel</button>
+                <button class="c-btn delete" onclick="App.confirmDeleteAction()">Move to Trash</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- HELPER: Time Ago ---
+        function timeAgo(dateParam) {
+            if (!dateParam) return null;
+            const date = typeof dateParam === 'object' ? dateParam : new Date(dateParam);
+            const today = new Date();
+            const seconds = Math.round((today - date) / 1000);
+            if (seconds < 60) return 'Just now';
+            const minutes = Math.round(seconds / 60);
+            if (minutes < 60) return `${minutes} mins ago`;
+            const hours = Math.round(minutes / 60);
+            if (hours < 24) return `${hours} hours ago`;
+            const days = Math.round(hours / 24);
+            return `${days} days ago`;
+        }
+
+        // --- SESSION MANAGEMENT ---
+        const SessionManager = {
+            currentUser: null,
+            init() {
+                const userStr = localStorage.getItem('user');
+                if (!userStr) { window.location.href = 'index.html'; return; }
+                this.currentUser = JSON.parse(userStr);
+                this.updateUI(this.currentUser);
+            },
+            updateUI(user) {
+                document.getElementById('userName').textContent = user.name || "User";
+                document.getElementById('userEmail').textContent = user.email || "No Email";
+                if (user.name) document.getElementById('userAvatar').textContent = user.name.substring(0,2).toUpperCase();
+                document.getElementById('welcomeMessage').textContent = `What will you design today, ${user.name.split(' ')[0]}?`;
+            },
+            logout() { localStorage.removeItem('user'); window.location.href = 'index.html'; }
+        };
+
+        // --- SEARCH FEATURE ---
+        const SearchApp = {
+            features: [
+                { name: "Editor", desc: "Create new designs", url: "editor.html", icon: "fa-pen-nib" },
+                { name: "Templates", desc: "Browse templates", url: "templates.html", icon: "fa-layer-group" },
+                { name: "Projects", desc: "View saved work", url: "projects.html", icon: "fa-folder-open" },
+                { name: "AI Image Gen", desc: "Generate images", url: "ai-generator.html", icon: "fa-robot" },
+                { name: "Content Planner", desc: "Schedule posts", url: "content-planner.html", icon: "fa-calendar-days" },
+                { name: "Settings", desc: "Account settings", url: "settings.html", icon: "fa-gear" },
+                { name: "Trash", desc: "Deleted items", url: "trash.html", icon: "fa-trash" }
+            ],
+            handleSearch(query) {
+                const container = document.getElementById('searchResults');
+                if(query.length < 2) { container.classList.remove('active'); return; }
+                
+                const matches = this.features.filter(f => f.name.toLowerCase().includes(query.toLowerCase()));
+                container.innerHTML = '';
+                
+                if(matches.length > 0) {
+                    matches.forEach(m => {
+                        const item = document.createElement('div');
+                        item.className = 'search-item';
+                        item.innerHTML = `<i class="fa-solid ${m.icon}"></i> <div><strong>${m.name}</strong><br><span style="font-size:0.75rem; color:#94a3b8;">${m.desc}</span></div>`;
+                        item.onclick = () => window.location.href = m.url;
+                        container.appendChild(item);
+                    });
+                    container.classList.add('active');
+                } else {
+                    container.innerHTML = '<div style="padding:15px; text-align:center; color:#94a3b8;">No features found</div>';
+                    container.classList.add('active');
+                }
+            }
+        };
+
+        // --- NOTIFICATION MANAGER ---
+        const NotificationManager = {
+            // Mock Data - In real app, fetch from DB
+            events: [
+                // { id: 1, title: "New Feature", msg: "Try our AI Background Remover!", type: "info" } 
+                // Uncomment above to test data state. Currently empty as requested to show "No Notifications"
+            ],
+            init() {
+                const badge = document.getElementById('notifBadge');
+                if(this.events.length > 0) badge.classList.add('active');
+            },
+            toggle() {
+                const popup = document.getElementById('notifPopup');
+                const list = document.getElementById('notifList');
+                
+                if (popup.classList.contains('show')) {
+                    popup.classList.remove('show');
+                } else {
+                    list.innerHTML = '';
+                    if (this.events.length === 0) {
+                        list.innerHTML = `
+                            <div class="notif-empty">
+                                <i class="fa-regular fa-bell-slash" style="font-size:2rem; color:#cbd5e1;"></i>
+                                <p>No new notifications</p>
+                            </div>
+                        `;
+                    } else {
+                        this.events.forEach(e => {
+                            list.innerHTML += `
+                                <div class="notif-item">
+                                    <div class="notif-icon"><i class="fa-solid fa-bolt"></i></div>
+                                    <div class="notif-text"><h5>${e.title}</h5><p>${e.msg}</p></div>
+                                </div>
+                            `;
+                        });
+                    }
+                    popup.classList.add('show');
+                }
+            }
+        };
+
+        // --- PAYMENT MANAGER (RAZORPAY) ---
+        const PaymentManager = {
+            currentAmount: 19,
+            openModal() { document.getElementById('upgradeModal').classList.add('show'); },
+            closeModal() { document.getElementById('upgradeModal').classList.remove('show'); },
+            
+            selectPlan(el, amount) {
+                document.querySelectorAll('.plan-card').forEach(c => c.classList.remove('active'));
+                el.classList.add('active');
+                this.currentAmount = amount;
+            },
+
+            initiatePayment() {
+                // IMPORTANT: Replace 'rzp_test_YOUR_KEY_HERE' with your real Razorpay Test Key ID
+                const options = {
+                    "key": "rzp_test_8A2yDSx4nOUMyN", 
+                    "amount": this.currentAmount * 100, // Amount in paise
+                    "currency": "USD",
+                    "name": "DesignEase Pro",
+                    "description": "Premium Subscription",
+                    "image": "https://via.placeholder.com/150", // Your Logo
+                    "handler": function (response) {
+                        // On Success
+                        PaymentManager.closeModal();
+                        document.getElementById('successModal').classList.add('show');
+                        // In real app, verify signature on backend here
+                    },
+                    "prefill": {
+                        "name": SessionManager.currentUser.name,
+                        "email": SessionManager.currentUser.email
+                    },
+                    "theme": { "color": "#6366f1" }
+                };
+                
+                try {
+                    const rzp1 = new Razorpay(options);
+                    rzp1.open();
+                    rzp1.on('payment.failed', function (response){
+                        alert("Payment Failed: " + response.error.description);
+                    });
+                } catch (e) {
+                    alert("Razorpay Error: Use the 'Demo' button if you haven't set a valid Key ID.");
+                }
+            },
+
+            // Fallback for demo purposes
+            simulateSuccess() {
+                this.closeModal();
+                setTimeout(() => {
+                    document.getElementById('successModal').classList.add('show');
+                }, 500);
+            }
+        };
+
+        // --- INDEXED DB HELPER ---
+        const IDB = {
+            dbName: 'DesignEaseDB_V2', version: 2, 
+            async open() {
+                return new Promise((resolve, reject) => {
+                    const req = indexedDB.open(this.dbName, this.version);
+                    req.onupgradeneeded = (e) => { 
+                        const db = e.target.result;
+                        if (!db.objectStoreNames.contains('designs')) db.createObjectStore('designs', { keyPath: 'id' });
+                        if (!db.objectStoreNames.contains('trash')) db.createObjectStore('trash', { keyPath: 'id' });
+                    };
+                    req.onsuccess = () => resolve(req.result);
+                    req.onerror = () => reject(req.error);
+                });
+            },
+            async getAll() {
+                const db = await this.open();
+                return new Promise((resolve) => {
+                    const tx = db.transaction('designs', 'readonly');
+                    const req = tx.objectStore('designs').getAll();
+                    req.onsuccess = () => resolve(req.result);
+                });
+            },
+            async moveToTrash(id) {
+                const db = await this.open();
+                return new Promise(async (resolve) => {
+                    const txGet = db.transaction('designs', 'readonly');
+                    const design = await new Promise(res => {
+                        const req = txGet.objectStore('designs').get(id);
+                        req.onsuccess = () => res(req.result);
+                    });
+
+                    if(design) {
+                        design.deletedDate = new Date().toISOString();
+                        const txTrash = db.transaction('trash', 'readwrite');
+                        await new Promise(res => {
+                            const req = txTrash.objectStore('trash').put(design);
+                            req.onsuccess = () => res();
+                        });
+
+                        const txDel = db.transaction('designs', 'readwrite');
+                        await new Promise(res => {
+                            const req = txDel.objectStore('designs').delete(id);
+                            req.onsuccess = () => res();
+                        });
+                    }
+                    resolve();
+                });
+            }
+        };
+
+        const App = {
+            pendingDeleteId: null,
+            init() {
+                SessionManager.init();
+                NotificationManager.init();
+                if(SessionManager.currentUser) this.loadSavedDesigns();
+                this.loadRecommended();
+                
+                // Close search on click outside
+                document.addEventListener('click', (e) => {
+                    if(!e.target.closest('.header-search')) document.getElementById('searchResults').classList.remove('active');
+                    if(!e.target.closest('.icon-btn')) document.getElementById('notifPopup').classList.remove('show');
+                });
+            },
+            async loadSavedDesigns() {
+                const grid = document.getElementById('savedDesignsGrid');
+                try {
+                    const allDesigns = await IDB.getAll(); 
+                    const designs = allDesigns.filter(d => d.owner === SessionManager.currentUser.email);
+                    grid.innerHTML = ''; 
+                    
+                    if(designs.length === 0) {
+                        grid.innerHTML = `
+                            <div class="empty-state-immersive">
+                                <div class="empty-icon-container"><i class="fa-solid fa-paintbrush"></i></div>
+                                <h3 class="empty-title">Your canvas is empty</h3>
+                                <p class="empty-desc">Unleash your creativity and start building something amazing. Your saved projects will appear here.</p>
+                                <button class="empty-btn" onclick="location.href='editor.html'"><i class="fa-solid fa-plus"></i> Create New Design</button>
+                            </div>
+                        `;
+                        return;
+                    }
+
+                    designs.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
+                    for (const d of designs) {
+                        const card = document.createElement('div'); card.className = 'design-card';
+                        card.onclick = () => window.location.href = `editor.html?id=${d.id}`;
+                        const timeString = timeAgo(d.date);
+                        card.innerHTML = `
+                            <div class="card-preview">
+                                <img src="${d.thumbnail || 'https://via.placeholder.com/300'}" alt="Preview" loading="lazy">
+                                <div class="card-actions">
+                                    <div class="card-action-btn" title="Edit"><i class="fa-solid fa-pen"></i></div>
+                                    <div class="card-action-btn danger" onclick="event.stopPropagation(); App.deleteDesign('${d.id}')" title="Delete"><i class="fa-solid fa-trash"></i></div>
+                                </div>
+                            </div>
+                            <div class="card-info">
+                                <div class="card-title">${d.name}</div>
+                                <div class="card-meta"><i class="fa-regular fa-clock"></i><span>${timeString}</span></div>
+                            </div>
+                        `;
+                        grid.appendChild(card);
+                    }
+                } catch (e) { console.error(e); }
+            },
+            loadRecommended() {
+                const grid = document.getElementById('recommendedTemplates');
+                const temps = [
+                    { t:'Resume', i:'https://images.unsplash.com/photo-1586281380349-632531db7ed4?auto=format&fit=crop&w=500&q=80' },
+                    { t:'Poster', i:'https://images.unsplash.com/photo-1572044162444-ad60f128bdea?auto=format&fit=crop&w=500&q=80' },
+                    { t:'Infographic', i:'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=500&q=80' },
+                    { t:'Business Card', i:'https://images.unsplash.com/photo-1593085512500-bfd4273c4d44?auto=format&fit=crop&w=500&q=80' }
+                ];
+                temps.forEach(t => {
+                    const card = document.createElement('div'); card.className = 'design-card';
+                    card.onclick = () => window.location.href = 'templates.html';
+                    card.innerHTML = `<div class="card-preview"><img src="${t.i}"></div><div class="card-info"><div class="card-title">${t.t}</div><div class="card-meta"><span style="color:var(--primary); font-size:0.75rem; font-weight:700;">POPULAR</span></div></div>`;
+                    grid.appendChild(card);
+                });
+            },
+            
+            // --- POPUP LOGIC ---
+            deleteDesign(id) {
+                this.pendingDeleteId = id;
+                document.getElementById('deleteConfirmModal').classList.add('show');
+            },
+            closeDeleteModal() {
+                document.getElementById('deleteConfirmModal').classList.remove('show');
+                this.pendingDeleteId = null;
+            },
+            async confirmDeleteAction() {
+                if (this.pendingDeleteId) {
+                    await IDB.moveToTrash(this.pendingDeleteId);
+                    this.loadSavedDesigns();
+                    this.closeDeleteModal();
+                }
+            }
+        };
+
+        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('active'); }
+        document.addEventListener('DOMContentLoaded', () => App.init());
+    </script>
+</body>
+</html>

@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invite Members - DesignEase</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* --- 1. SHARED CSS (Variables & Layout) --- */
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --accent: #d946ef;
+            --bg-body: #f8fafc;
+            --bg-sidebar: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --sidebar-width: 260px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --success-bg: #dcfce7;
+            --success-text: #166534;
+            --gradient-magic: linear-gradient(135deg, #6366f1 0%, #d946ef 100%);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
+        button { border: none; outline: none; background: none; font-family: inherit; }
+
+        /* --- 2. SIDEBAR (Fixed & Consistent) --- */
+        .sidebar {
+            position: fixed; top: 0; left: 0; width: var(--sidebar-width); height: 100vh;
+            background: var(--bg-sidebar); border-right: 1px solid var(--border);
+            display: flex; flex-direction: column; z-index: 50; padding: 1.5rem 1rem;
+            transition: transform 0.3s ease;
+        }
+
+        .logo { font-size: 1.5rem; font-weight: 800; background: var(--gradient-magic); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .sidebar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding: 0 0.5rem; }
+        
+        .create-btn {
+            width: 100%; padding: 0.75rem; background: var(--primary); color: white; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: var(--shadow-sm); margin-bottom: 1.5rem; transition: all 0.2s;
+        }
+        .create-btn:hover { background: var(--primary-dark); transform: translateY(-1px); }
+
+        .nav-list { flex: 1; overflow-y: auto; }
+        .nav-item { margin-bottom: 4px; }
+        .nav-link { display: flex; align-items: center; gap: 12px; padding: 0.6rem 0.8rem; color: var(--text-muted); border-radius: 8px; font-weight: 500; font-size: 0.95rem; transition: all 0.2s; }
+        .nav-link:hover { background: #f1f5f9; color: var(--primary); }
+        .nav-link.active { background: #e0e7ff; color: var(--primary); font-weight: 600; }
+        .nav-divider { height: 1px; background: var(--border); margin: 1rem 0; }
+        .nav-label { font-size: 0.75rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted); margin: 0 0 0.5rem 0.8rem; }
+
+        /* UPDATED USER CARD STYLES */
+        .sidebar-footer { margin-top: auto; padding-top: 1rem; border-top: 1px solid var(--border); }
+        .user-card { display: flex; align-items: center; gap: 10px; padding: 0.5rem; border-radius: 8px; cursor: pointer; transition: background 0.2s; }
+        .user-card:hover { background: #f8fafc; }
+        .user-avatar { width: 36px; height: 36px; background: #e2e8f0; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.8rem; color: var(--text-main); }
+        .user-info h4 { font-size: 0.9rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px; }
+        .user-info p { font-size: 0.75rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px; }
+        .logout-btn { margin-left: auto; color: var(--text-muted); cursor: pointer; padding: 5px; }
+        .logout-btn:hover { color: #ef4444; }
+
+        /* --- 3. MAIN WRAPPER --- */
+        .main-wrapper {
+            margin-left: var(--sidebar-width);
+            width: calc(100% - var(--sidebar-width));
+            display: flex; flex-direction: column;
+        }
+
+        .top-header {
+            position: sticky; top: 0; background: rgba(248, 250, 252, 0.8); backdrop-filter: blur(10px); padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; z-index: 40; border-bottom: 1px solid var(--border);
+        }
+
+        .header-actions { display: flex; gap: 1rem; }
+        .icon-btn { width: 36px; height: 36px; border-radius: 50%; background: white; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; color: var(--text-muted); cursor: pointer; }
+        .icon-btn:hover { background: #f1f5f9; color: var(--text-main); }
+
+        /* --- 4. PAGE SPECIFIC STYLES (Invite Page) --- */
+        .page-content { padding: 2rem; max-width: 1200px; margin: 0 auto; width: 100%; }
+
+        .section-header { margin-bottom: 2rem; }
+        .section-header h1 { font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .section-header p { color: var(--text-muted); }
+
+        .invite-grid {
+            display: grid; grid-template-columns: 350px 1fr; gap: 2rem; align-items: start;
+        }
+
+        /* Generic Card Style */
+        .card {
+            background: white; border-radius: 16px; border: 1px solid var(--border); box-shadow: var(--shadow-sm); padding: 1.5rem;
+        }
+
+        /* Left Column: Invite Form */
+        .invite-form h3 { font-size: 1.1rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 8px; }
+        .invite-form h3 i { color: var(--primary); }
+
+        .input-group { margin-bottom: 1.5rem; }
+        .input-label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-main); }
+        
+        .styled-input {
+            width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 8px; font-size: 0.95rem; transition: border-color 0.2s;
+        }
+        .styled-input:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); }
+
+        .btn-invite {
+            width: 100%; padding: 0.75rem; background: var(--text-main); color: white; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+        }
+        .btn-invite:hover { background: #334155; }
+
+        /* Copy Link Box */
+        .copy-box {
+            display: flex; background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 4px; margin-top: 0.5rem;
+        }
+        .copy-box input {
+            flex: 1; border: none; background: transparent; padding: 0 0.5rem; color: var(--text-muted); font-size: 0.85rem; outline: none;
+        }
+        .btn-copy {
+            background: white; border: 1px solid var(--border); padding: 0.4rem 0.8rem; border-radius: 6px; font-size: 0.8rem; font-weight: 600; cursor: pointer;
+        }
+        .btn-copy:hover { border-color: var(--text-muted); }
+
+        /* Right Column: Member List */
+        .list-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border); }
+        .list-title span { background: #e0e7ff; color: var(--primary); padding: 2px 8px; border-radius: 12px; font-size: 0.8rem; margin-left: 8px; }
+
+        .member-item {
+            display: flex; align-items: center; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid #f1f5f9;
+        }
+        .member-item:last-child { border-bottom: none; }
+
+        .member-left { display: flex; align-items: center; gap: 12px; }
+        .member-avatar {
+            width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #FF9A9E 0%, #FECFEF 100%);
+            display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9rem; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        /* Avatar Variations */
+        .av-1 { background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%); }
+        .av-2 { background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%); }
+        .av-3 { background: linear-gradient(135deg, #fccb90 0%, #d57eeb 100%); }
+
+        .member-details h4 { font-size: 0.95rem; font-weight: 600; color: var(--text-main); }
+        .member-details p { font-size: 0.8rem; color: var(--text-muted); }
+
+        .member-right { display: flex; align-items: center; gap: 1rem; }
+
+        /* Roles */
+        .role-select {
+            padding: 0.3rem 0.6rem; border: 1px solid var(--border); border-radius: 6px; font-size: 0.85rem; color: var(--text-main); background: transparent; cursor: pointer;
+        }
+
+        .badge { font-size: 0.75rem; font-weight: 700; padding: 4px 8px; border-radius: 4px; }
+        .badge-owner { background: #dbeafe; color: #1e40af; }
+        .badge-pending { background: #fef9c3; color: #854d0e; }
+
+        .remove-btn { color: #cbd5e1; cursor: pointer; transition: color 0.2s; }
+        .remove-btn:hover { color: #ef4444; }
+
+        /* Responsive */
+        @media (max-width: 900px) { .invite-grid { grid-template-columns: 1fr; } }
+        @media (max-width: 768px) {
+            :root { --sidebar-width: 0px; }
+            .sidebar { transform: translateX(-100%); width: 260px; }
+            .sidebar.active { transform: translateX(0); box-shadow: 10px 0 20px rgba(0,0,0,0.1); }
+            .mobile-menu-toggle { display: block; }
+            .close-sidebar-btn { display: block; }
+        }
+        .mobile-menu-toggle { display: none; font-size: 1.5rem; cursor: pointer; }
+        .close-sidebar-btn { display: none; cursor: pointer; color: var(--text-muted); }
+
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="index.html" class="logo">Design<span>Ease</span></a>
+            <i class="fa-solid fa-xmark close-sidebar-btn" onclick="toggleSidebar()"></i>
+        </div>
+        
+        <div class="create-btn-container">
+            <button class="create-btn" onclick="location.href='editor.html'">
+                <i class="fa-solid fa-plus"></i> Create a design
+            </button>
+        </div>
+
+        <ul class="nav-list">
+            <li class="nav-item"><a href="home.html" class="nav-link"><i class="fa-solid fa-house"></i> Home</a></li>
+            <li class="nav-item"><a href="projects.html" class="nav-link"><i class="fa-solid fa-folder-open"></i> Projects</a></li>
+            <li class="nav-item"><a href="templates.html" class="nav-link"><i class="fa-solid fa-layer-group"></i> Templates</a></li>
+            <li class="nav-divider"></li>
+            <li class="nav-label">Tools</li>
+            <li class="nav-item"><a href="ai-generator.html" class="nav-link"><i class="fa-solid fa-robot"></i> AI Image Gen</a></li>
+            <li class="nav-item"><a href="content-planner.html" class="nav-link"><i class="fa-solid fa-calendar-days"></i> Content Planner</a></li>
+            <li class="nav-divider"></li>
+            <li class="nav-label">Team</li>
+            <li class="nav-item"><a href="invite.html" class="nav-link active"><i class="fa-solid fa-users"></i> Invite Members</a></li>
+            <li class="nav-item"><a href="settings.html" class="nav-link"><i class="fa-solid fa-gear"></i> Settings</a></li>
+            <li class="nav-item"><a href="trash.html" class="nav-link"><i class="fa-solid fa-trash"></i> Trash</a></li>
+            
+        </ul>
+
+        <div class="sidebar-footer">
+            <div class="user-card">
+                <div class="user-avatar" id="userAvatar">G</div>
+                <div class="user-info">
+                    <h4 id="userName">Guest</h4>
+                    <p id="userEmail">Login required</p>
+                </div>
+                <div class="logout-btn" onclick="SessionManager.logout()" title="Logout">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <div class="main-wrapper">
+        <header class="top-header">
+            <div style="display: flex; align-items: center;">
+                <i class="fa-solid fa-bars mobile-menu-toggle" onclick="toggleSidebar()" style="margin-right: 1rem;"></i>
+                <h2 style="font-weight: 700; font-size: 1.25rem;">Team Management</h2>
+            </div>
+            <div class="header-actions">
+                <div class="icon-btn"><i class="fa-solid fa-bell"></i></div>
+            </div>
+        </header>
+
+        <div class="page-content">
+            
+            <div class="section-header">
+                <h1>Invite your team</h1>
+                <p>Collaborate in real-time, share assets, and design faster together.</p>
+            </div>
+
+            <div class="invite-grid">
+                
+                <div class="card invite-form">
+                    <h3><i class="fa-regular fa-envelope"></i> Invite via Email</h3>
+                    
+                    <div class="input-group">
+                        <label class="input-label">Email Address</label>
+                        <input type="email" placeholder="colleague@company.com" class="styled-input">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label class="input-label">Role</label>
+                        <select class="styled-input">
+                            <option>Editor (Can edit & create)</option>
+                            <option>Viewer (Can view & comment)</option>
+                            <option>Admin (Full access)</option>
+                        </select>
+                    </div>
+
+                    <button class="btn-invite">Send Invitation</button>
+
+                    <div style="margin: 1.5rem 0; height: 1px; background: var(--border);"></div>
+
+                    <h3><i class="fa-solid fa-link"></i> Invite Link</h3>
+                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.5rem;">Anyone with this link can join as an Editor.</p>
+                    <div class="copy-box">
+                        <input type="text" value="https://designease.app/join/x8d9s7" readonly>
+                        <button class="btn-copy">Copy</button>
+                    </div>
+                </div>
+
+                <div class="card members-list">
+                    <div class="list-header">
+                        <div class="list-title">
+                            <h3>Members <span>4</span></h3>
+                        </div>
+                        <div style="display: flex; gap: 8px;">
+                            <input type="text" placeholder="Search members..." style="padding: 6px 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.85rem;">
+                        </div>
+                    </div>
+
+                    <div class="member-item">
+                        <div class="member-left">
+                            <div class="member-avatar" id="memberListAvatar">G</div> 
+                            <div class="member-details">
+                                <h4 id="memberListName">Guest (You)</h4> 
+                                <p id="memberListEmail">guest@designease.com</p>
+                            </div>
+                        </div>
+                        <div class="member-right">
+                            <span class="badge badge-owner">Owner</span>
+                        </div>
+                    </div>
+
+                    <div class="member-item">
+                        <div class="member-left">
+                            <div class="member-avatar av-1">AB</div>
+                            <div class="member-details">
+                                <h4>Alice Brown</h4>
+                                <p>alice@designease.com</p>
+                            </div>
+                        </div>
+                        <div class="member-right">
+                            <select class="role-select">
+                                <option selected>Editor</option>
+                                <option>Viewer</option>
+                            </select>
+                            <i class="fa-solid fa-trash-can remove-btn" title="Remove User"></i>
+                        </div>
+                    </div>
+
+                    <div class="member-item">
+                        <div class="member-left">
+                            <div class="member-avatar av-2">CW</div>
+                            <div class="member-details">
+                                <h4>Charlie Wilson</h4>
+                                <p>charlie@designease.com</p>
+                            </div>
+                        </div>
+                        <div class="member-right">
+                            <select class="role-select">
+                                <option>Editor</option>
+                                <option selected>Viewer</option>
+                            </select>
+                            <i class="fa-solid fa-trash-can remove-btn" title="Remove User"></i>
+                        </div>
+                    </div>
+
+                    <div class="member-item">
+                        <div class="member-left">
+                            <div class="member-avatar av-3" style="opacity: 0.6;"><i class="fa-regular fa-envelope"></i></div>
+                            <div class="member-details">
+                                <h4>sarah@design.com</h4>
+                                <p>Invitation Sent</p>
+                            </div>
+                        </div>
+                        <div class="member-right">
+                            <span class="badge badge-pending">Pending</span>
+                            <i class="fa-solid fa-xmark remove-btn" title="Revoke Invite" style="margin-left: 10px;"></i>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- SESSION MANAGEMENT LOGIC ---
+        const SessionManager = {
+            init() {
+                const userStr = localStorage.getItem('user');
+                
+                if (!userStr) {
+                    // window.location.href = 'login.html'; // Uncomment to enforce login
+                    return;
+                }
+
+                try {
+                    const user = JSON.parse(userStr);
+                    this.updateUI(user);
+                } catch (e) {
+                    console.error("Invalid session data", e);
+                    localStorage.removeItem('user');
+                }
+            },
+
+            updateUI(user) {
+                // 1. Update Sidebar
+                const nameEl = document.getElementById('userName');
+                const emailEl = document.getElementById('userEmail');
+                const avatarEl = document.getElementById('userAvatar');
+
+                if (nameEl) nameEl.textContent = user.name || "User";
+                if (emailEl) emailEl.textContent = user.email || "No Email";
+                
+                // Initials calculation
+                let initials = "G";
+                if (user.name) {
+                    initials = user.name.split(' ')
+                        .map(n => n[0])
+                        .slice(0, 2)
+                        .join('')
+                        .toUpperCase();
+                }
+
+                if (avatarEl) avatarEl.textContent = initials;
+
+                // 2. Update "You" in Member List (Specific to this page)
+                const memName = document.getElementById('memberListName');
+                const memEmail = document.getElementById('memberListEmail');
+                const memAvatar = document.getElementById('memberListAvatar');
+
+                if (memName) memName.textContent = `${user.name} (You)`;
+                if (memEmail) memEmail.textContent = user.email;
+                if (memAvatar) memAvatar.textContent = initials;
+            },
+
+            logout() {
+                localStorage.removeItem('user');
+                alert("Logged out successfully");
+                window.location.href = 'index.html'; 
+            }
+        };
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+        }
+
+        // Copy Button Logic
+        const copyBtns = document.querySelectorAll('.btn-copy');
+        copyBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const originalText = btn.innerText;
+                btn.innerText = 'Copied!';
+                btn.style.background = '#dcfce7';
+                btn.style.color = '#166534';
+                setTimeout(() => {
+                    btn.innerText = originalText;
+                    btn.style.background = 'white';
+                    btn.style.color = 'inherit';
+                }, 2000);
+            });
+        });
+
+        // Initialize Session
+        document.addEventListener('DOMContentLoaded', () => {
+            SessionManager.init();
+        });
+    </script>
+</body>
+</html>

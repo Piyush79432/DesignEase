@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - DesignEase</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* --- 1. SHARED CSS (Consistent across pages) --- */
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --accent: #d946ef;
+            --bg-body: #f8fafc;
+            --bg-sidebar: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --sidebar-width: 260px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --gradient-magic: linear-gradient(135deg, #6366f1 0%, #d946ef 100%);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
+        button { border: none; outline: none; background: none; font-family: inherit; }
+
+        /* --- 2. SIDEBAR --- */
+        .sidebar {
+            position: fixed;
+            top: 0; left: 0;
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: var(--bg-sidebar);
+            border-right: 1px solid var(--border);
+            display: flex; flex-direction: column;
+            z-index: 50; padding: 1.5rem 1rem;
+            transition: transform 0.3s ease;
+        }
+
+        .logo { font-size: 1.5rem; font-weight: 800; background: var(--gradient-magic); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .sidebar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding: 0 0.5rem; }
+        
+        .create-btn {
+            width: 100%; padding: 0.75rem; background: var(--primary); color: white; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: var(--shadow-sm); margin-bottom: 1.5rem; transition: all 0.2s;
+        }
+        .create-btn:hover { background: var(--primary-dark); transform: translateY(-1px); }
+
+        .nav-list { flex: 1; overflow-y: auto; }
+        .nav-item { margin-bottom: 4px; }
+        .nav-link { display: flex; align-items: center; gap: 12px; padding: 0.6rem 0.8rem; color: var(--text-muted); border-radius: 8px; font-weight: 500; font-size: 0.95rem; transition: all 0.2s; }
+        .nav-link:hover { background: #f1f5f9; color: var(--primary); }
+        .nav-link.active { background: #e0e7ff; color: var(--primary); font-weight: 600; }
+        .nav-divider { height: 1px; background: var(--border); margin: 1rem 0; }
+        .nav-label { font-size: 0.75rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted); margin: 0 0 0.5rem 0.8rem; }
+        
+        /* UPDATED USER CARD STYLES */
+        .sidebar-footer { margin-top: auto; padding-top: 1rem; border-top: 1px solid var(--border); }
+        .user-card { display: flex; align-items: center; gap: 10px; padding: 0.5rem; border-radius: 8px; cursor: pointer; transition: background 0.2s; }
+        .user-card:hover { background: #f8fafc; }
+        .user-avatar { width: 36px; height: 36px; background: #e2e8f0; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.8rem; color: var(--text-main); }
+        .user-info h4 { font-size: 0.9rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px; }
+        .user-info p { font-size: 0.75rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px; }
+        .logout-btn { margin-left: auto; color: var(--text-muted); cursor: pointer; padding: 5px; }
+        .logout-btn:hover { color: #ef4444; }
+
+        /* --- 3. MAIN WRAPPER --- */
+        .main-wrapper {
+            margin-left: var(--sidebar-width);
+            width: calc(100% - var(--sidebar-width));
+            display: flex; flex-direction: column;
+        }
+
+        .top-header {
+            position: sticky; top: 0; background: rgba(248, 250, 252, 0.8); backdrop-filter: blur(10px); padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; z-index: 40; border-bottom: 1px solid var(--border);
+        }
+
+        /* --- 4. SETTINGS PAGE SPECIFIC --- */
+        .page-content { padding: 2rem; max-width: 1100px; margin: 0 auto; width: 100%; }
+
+        .settings-grid {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        .card {
+            background: white; border-radius: 16px; border: 1px solid var(--border); box-shadow: var(--shadow-sm); padding: 1.5rem; margin-bottom: 1.5rem;
+        }
+
+        .section-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid #f1f5f9; }
+
+        /* Profile Card (Left) */
+        .profile-card { text-align: center; }
+        .profile-img-container { position: relative; width: 100px; height: 100px; margin: 0 auto 1rem auto; }
+        .profile-img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; background: #e0e7ff; display: flex; align-items: center; justify-content: center; font-size: 2rem; color: var(--primary); font-weight: 700; }
+        .edit-photo-btn { position: absolute; bottom: 0; right: 0; background: var(--primary); color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 2px solid white; }
+        .profile-name { font-size: 1.2rem; font-weight: 700; margin-bottom: 0.25rem; }
+        .profile-role { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem; }
+        
+        /* Form Elements */
+        .input-group { margin-bottom: 1.25rem; }
+        .input-label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-main); }
+        .input-field { width: 100%; padding: 0.7rem; border: 1px solid var(--border); border-radius: 8px; font-size: 0.95rem; transition: all 0.2s; background: #fff; }
+        .input-field:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); }
+        select.input-field { cursor: pointer; }
+
+        .btn-primary { background: var(--primary); color: white; padding: 0.7rem 1.5rem; border-radius: 8px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        
+        /* Custom Toggle Switch */
+        .toggle-row { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px solid #f8fafc; }
+        .toggle-row:last-child { border-bottom: none; }
+        .toggle-text h4 { font-size: 0.95rem; font-weight: 600; margin-bottom: 2px; }
+        .toggle-text p { font-size: 0.8rem; color: var(--text-muted); }
+
+        .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        input:checked + .slider { background-color: var(--primary); }
+        input:checked + .slider:before { transform: translateX(20px); }
+
+        /* API Box */
+        .api-box { background: #f8fafc; border: 1px dashed var(--border); padding: 1.5rem; border-radius: 12px; margin-bottom: 1rem; }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .settings-grid { grid-template-columns: 1fr; }
+            .profile-card { display: flex; align-items: center; gap: 20px; text-align: left; }
+            .profile-img-container { margin: 0; }
+        }
+        @media (max-width: 768px) {
+            :root { --sidebar-width: 0px; }
+            .sidebar { transform: translateX(-100%); width: 260px; }
+            .sidebar.active { transform: translateX(0); box-shadow: 10px 0 20px rgba(0,0,0,0.1); }
+            .mobile-menu-toggle { display: block; }
+            .close-sidebar-btn { display: block; }
+        }
+        .mobile-menu-toggle { display: none; font-size: 1.5rem; cursor: pointer; }
+        .close-sidebar-btn { display: none; cursor: pointer; color: var(--text-muted); }
+
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="home.html" class="logo">Design<span>Ease</span></a>
+            <i class="fa-solid fa-xmark close-sidebar-btn" onclick="toggleSidebar()"></i>
+        </div>
+        
+        <div class="create-btn-container">
+            <button class="create-btn" onclick="location.href='editor.html'">
+                <i class="fa-solid fa-plus"></i> Create Design
+            </button>
+        </div>
+
+        <ul class="nav-list">
+            <li class="nav-item"><a href="home.html" class="nav-link"><i class="fa-solid fa-house"></i> Home</a></li>
+            <li class="nav-item"><a href="projects.html" class="nav-link"><i class="fa-solid fa-folder-open"></i> Projects</a></li>
+            <li class="nav-item"><a href="templates.html" class="nav-link"><i class="fa-solid fa-layer-group"></i> Templates</a></li>
+            <li class="nav-divider"></li>
+            <li class="nav-label">Tools</li>
+            <li class="nav-item"><a href="ai-generator.html" class="nav-link"><i class="fa-solid fa-robot"></i> AI Image Gen</a></li>
+            <li class="nav-item"><a href="content-planner.html" class="nav-link"><i class="fa-solid fa-calendar-days"></i> Content Planner</a></li>
+            <li class="nav-divider"></li>
+            <li class="nav-label">Team</li>
+            <li class="nav-item"><a href="invite.html" class="nav-link"><i class="fa-solid fa-users"></i> Invite Members</a></li>
+            <li class="nav-item"><a href="settings.html" class="nav-link active"><i class="fa-solid fa-gear"></i> Settings</a></li>
+            <li class="nav-item"><a href="trash.html" class="nav-link"><i class="fa-solid fa-trash"></i> Trash</a></li>
+        </ul>
+
+        <div class="sidebar-footer">
+            <div class="user-card">
+                <div class="user-avatar" id="userAvatar">JD</div>
+                <div class="user-info">
+                    <h4 id="userName">John Doe</h4>
+                    <p id="userEmail" style="font-size: 0.75rem; color:var(--text-muted);">Personal Team</p>
+                </div>
+                <div class="logout-btn" onclick="SessionManager.logout()" title="Logout">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <div class="main-wrapper">
+        <header class="top-header">
+            <div style="display: flex; align-items: center;">
+                <i class="fa-solid fa-bars mobile-menu-toggle" onclick="toggleSidebar()" style="margin-right: 1rem;"></i>
+                <h2 style="font-weight: 700; font-size: 1.25rem;">Settings</h2>
+            </div>
+        </header>
+
+        <div class="page-content">
+            <div class="settings-grid">
+                
+                <div class="left-col">
+                    <div class="card profile-card">
+                        <div class="profile-img-container">
+                            <div class="profile-img" id="cardAvatar">JD</div>
+                            <div class="edit-photo-btn"><i class="fa-solid fa-camera" style="font-size: 0.8rem;"></i></div>
+                        </div>
+                        <h3 class="profile-name" id="cardName">John Doe</h3>
+                        <p class="profile-role" id="cardRole">Admin • Personal Team</p>
+                        <button class="btn-primary" style="width: 100%; background: white; color: var(--text-main); border: 1px solid var(--border);">Manage Account</button>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="section-title">Appearance</h3>
+                        <div class="input-group">
+                            <label class="input-label">Interface Theme</label>
+                            <select class="input-field">
+                                <option>Light Mode</option>
+                                <option>Dark Mode</option>
+                                <option>System Default</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Language</label>
+                            <select class="input-field">
+                                <option>English (US)</option>
+                                <option>Spanish</option>
+                                <option>French</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="right-col">
+                    
+                    <div class="card">
+                        <h3 class="section-title">Personal Information</h3>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div class="input-group">
+                                <label class="input-label">First Name</label>
+                                <input type="text" id="inputFirstName" class="input-field">
+                            </div>
+                            <div class="input-group">
+                                <label class="input-label">Last Name</label>
+                                <input type="text" id="inputLastName" class="input-field">
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Email Address</label>
+                            <input type="email" id="inputEmail" class="input-field" disabled>
+                        </div>
+                        <div style="text-align: right;">
+                            <button class="btn-primary">Save Changes</button>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="section-title">Notifications</h3>
+                        
+                        <div class="toggle-row">
+                            <div class="toggle-text">
+                                <h4>Email Notifications</h4>
+                                <p>Receive updates and offers via email</p>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="toggle-row">
+                            <div class="toggle-text">
+                                <h4>Push Notifications</h4>
+                                <p>Get notified about comments and shares</p>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="toggle-row">
+                            <div class="toggle-text">
+                                <h4>Weekly Digest</h4>
+                                <p>A summary of your team's activity</p>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="section-title">Developer Settings</h3>
+                        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem;">Configure your external tool integrations.</p>
+                        
+                        <div class="api-box">
+                            <div class="input-group">
+                                <label class="input-label">Canva API Key</label>
+                                <input type="password" placeholder="sk_live_..." class="input-field" id="canvaApiKey" style="font-family: monospace;">
+                            </div>
+                            <div class="input-group">
+                                <label class="input-label">Partner ID</label>
+                                <input type="text" placeholder="pid_..." class="input-field" id="canvaPartnerId" style="font-family: monospace;">
+                            </div>
+                        </div>
+
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <a href="https://www.canva.com/developers/" target="_blank" style="font-size: 0.85rem; color: var(--primary); font-weight: 500;"><i class="fa-solid fa-external-link-alt"></i> Get Credentials</a>
+                            <button class="btn-primary" onclick="saveApiConfig()">Save API Keys</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- SESSION MANAGEMENT LOGIC ---
+        const SessionManager = {
+            init() {
+                const userStr = localStorage.getItem('user');
+                
+                if (!userStr) {
+                    // window.location.href = 'login.html'; 
+                    return;
+                }
+
+                try {
+                    const user = JSON.parse(userStr);
+                    this.updateUI(user);
+                    this.populateForm(user);
+                } catch (e) {
+                    console.error("Invalid session data", e);
+                    localStorage.removeItem('user');
+                }
+            },
+
+            // Updates the Sidebar (Standard across all pages)
+            updateUI(user) {
+                const nameEl = document.getElementById('userName');
+                const emailEl = document.getElementById('userEmail');
+                const avatarEl = document.getElementById('userAvatar');
+
+                if (nameEl) nameEl.textContent = user.name || "User";
+                if (emailEl) emailEl.textContent = user.email || "No Email";
+                
+                if (avatarEl && user.name) {
+                    const initials = this.getInitials(user.name);
+                    avatarEl.textContent = initials;
+                }
+            },
+
+            // Updates the Page-Specific Form Fields
+            populateForm(user) {
+                // 1. Profile Card (Left)
+                const cardName = document.getElementById('cardName');
+                const cardAvatar = document.getElementById('cardAvatar');
+                
+                if(cardName) cardName.textContent = user.name;
+                if(cardAvatar) cardAvatar.textContent = this.getInitials(user.name);
+
+                // 2. Personal Information Form (Right)
+                const firstNameInput = document.getElementById('inputFirstName');
+                const lastNameInput = document.getElementById('inputLastName');
+                const emailInput = document.getElementById('inputEmail');
+
+                if (user.name) {
+                    const names = user.name.split(' ');
+                    if(firstNameInput) firstNameInput.value = names[0] || '';
+                    if(lastNameInput) lastNameInput.value = names.slice(1).join(' ') || '';
+                }
+                if(emailInput) emailInput.value = user.email || '';
+            },
+
+            getInitials(name) {
+                return name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
+            },
+
+            logout() {
+                localStorage.removeItem('user');
+                alert("Logged out successfully");
+                window.location.href = 'index.html'; 
+            }
+        };
+
+        // --- PAGE SPECIFIC FUNCTIONS ---
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+        }
+
+        function saveApiConfig() {
+            const apiKey = document.getElementById('canvaApiKey').value;
+            const partnerId = document.getElementById('canvaPartnerId').value;
+            
+            if (apiKey && partnerId) {
+                localStorage.setItem('canva_api_key', apiKey);
+                localStorage.setItem('canva_partner_id', partnerId);
+                
+                const btn = document.querySelector('button[onclick="saveApiConfig()"]');
+                const originalText = btn.innerText;
+                btn.innerText = "Saved!";
+                btn.style.background = "#166534";
+                
+                setTimeout(() => {
+                    btn.innerText = originalText;
+                    btn.style.background = "";
+                }, 2000);
+            } else {
+                alert('Please fill in both API Key and Partner ID fields.');
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            SessionManager.init();
+            
+            // Load saved API settings
+            const savedApiKey = localStorage.getItem('canva_api_key');
+            const savedPartnerId = localStorage.getItem('canva_partner_id');
+            if (savedApiKey) document.getElementById('canvaApiKey').value = savedApiKey;
+            if (savedPartnerId) document.getElementById('canvaPartnerId').value = savedPartnerId;
+        });
+    </script>
+</body>
+</html>

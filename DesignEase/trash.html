@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trash - DesignEase</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root { --primary: #6366f1; --primary-dark: #4f46e5; --accent: #d946ef; --danger: #ef4444; --bg-body: #f8fafc; --bg-sidebar: #ffffff; --text-main: #0f172a; --text-muted: #64748b; --border: #e2e8f0; --sidebar-width: 260px; --gradient-magic: linear-gradient(135deg, #6366f1 0%, #d946ef 100%); }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background-color: var(--bg-body); color: var(--text-main); display: flex; min-height: 100vh; overflow-x: hidden; }
+        a { text-decoration: none; color: inherit; } ul { list-style: none; } button { border: none; outline: none; background: none; font-family: inherit; }
+
+        /* --- SIDEBAR --- */
+        .sidebar { position: fixed; top: 0; left: 0; width: var(--sidebar-width); height: 100vh; background: var(--bg-sidebar); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 50; padding: 1.5rem 1rem; transition: transform 0.3s ease; }
+        .logo { font-size: 1.5rem; font-weight: 800; background: var(--gradient-magic); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .sidebar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding: 0 0.5rem; }
+        .create-btn { width: 100%; padding: 0.75rem; background: var(--primary); color: white; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 1.5rem; }
+        .nav-list { flex: 1; overflow-y: auto; } .nav-item { margin-bottom: 4px; }
+        .nav-link { display: flex; align-items: center; gap: 12px; padding: 0.6rem 0.8rem; color: var(--text-muted); border-radius: 8px; font-weight: 500; font-size: 0.95rem; transition: all 0.2s; }
+        .nav-link:hover { background: #f1f5f9; color: var(--primary); }
+        .nav-link.active { background: #e0e7ff; color: var(--primary); font-weight: 600; }
+        .nav-divider { height: 1px; background: var(--border); margin: 1rem 0; }
+        .nav-label { font-size: 0.75rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted); margin: 0 0 0.5rem 0.8rem; }
+        .sidebar-footer { margin-top: auto; padding-top: 1rem; border-top: 1px solid var(--border); }
+        .user-card { display: flex; align-items: center; gap: 10px; padding: 0.5rem; border-radius: 8px; transition: background 0.2s; }
+        .user-card:hover { background: #f8fafc; }
+        .user-avatar { width: 36px; height: 36px; background: #e2e8f0; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.8rem; color: var(--text-main); }
+        .user-info h4 { font-size: 0.9rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 110px; }
+        .user-info p { font-size: 0.75rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 110px; }
+        .logout-btn { margin-left: auto; color: var(--text-muted); cursor: pointer; padding: 6px; border-radius: 6px; transition: 0.2s; }
+        .logout-btn:hover { background: #fee2e2; color: #ef4444; }
+
+        /* --- MAIN LAYOUT --- */
+        .main-wrapper { margin-left: var(--sidebar-width); width: calc(100% - var(--sidebar-width)); display: flex; flex-direction: column; position: relative; min-height: 100vh; }
+        .top-header { position: sticky; top: 0; background: rgba(248, 250, 252, 0.8); backdrop-filter: blur(10px); padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; z-index: 40; border-bottom: 1px solid var(--border); }
+        .btn-danger { color: var(--danger); border: 1px solid var(--border); padding: 0.5rem 1rem; border-radius: 8px; font-weight: 600; font-size: 0.9rem; transition: all 0.2s; background: white; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+        .btn-danger:hover { background: #fef2f2; border-color: var(--danger); }
+        .btn-danger:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .page-content { padding: 2rem; max-width: 1400px; margin: 0 auto; width: 100%; position: relative; z-index: 10; }
+        .info-banner { background: #e0e7ff; border: 1px solid #c7d2fe; color: #3730a3; padding: 1rem; border-radius: 8px; margin-bottom: 2rem; display: flex; align-items: center; gap: 10px; font-size: 0.9rem; }
+        
+        .trash-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1.5rem; transition: opacity 0.3s; }
+        
+        .trash-card { background: white; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; transition: all 0.3s ease-out; position: relative; display: flex; flex-direction: column; z-index: 1; }
+        .trash-card:hover { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); border-color: #cbd5e1; }
+        .card-preview { height: 150px; background: #f1f5f9; position: relative; display: flex; align-items: center; justify-content: center; opacity: 0.8; overflow: hidden; }
+        .card-preview img { width: 100%; height: 100%; object-fit: cover; }
+        .days-left-badge { position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.6); color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 600; }
+        .card-body { padding: 1rem; }
+        .card-title { font-weight: 600; font-size: 0.95rem; margin-bottom: 4px; }
+        .card-actions { border-top: 1px solid var(--border); padding: 0.5rem; display: flex; justify-content: space-around; background: #f8fafc; }
+        .action-icon { cursor: pointer; padding: 6px; border-radius: 4px; color: var(--text-muted); transition: all 0.2s; font-size: 0.9rem; }
+        .action-icon:hover { background: #e2e8f0; color: var(--text-main); }
+        .action-icon.restore:hover { color: var(--primary); background: #e0e7ff; }
+        .action-icon.delete:hover { color: var(--danger); background: #fee2e2; }
+
+        /* --- EMPTY STATE --- */
+        .empty-state { display: none; flex-direction: column; align-items: center; justify-content: center; padding: 4rem 2rem; text-align: center; color: var(--text-muted); animation: fadeIn 0.5s ease; }
+        .empty-state.visible { display: flex; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- ANIMATION LAYER & BIN --- */
+        .animation-layer {
+            position: fixed; inset: 0; z-index: 100; pointer-events: none;
+            display: flex; flex-direction: column; justify-content: flex-end; align-items: center;
+            overflow: hidden;
+        }
+
+        .big-bin-container {
+            position: relative;
+            width: 200px;
+            height: 240px;
+            transform: translateY(350px); /* Hidden initially */
+            transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex; flex-direction: column; align-items: center;
+        }
+        
+        .bin-lid {
+            width: 220px; height: 40px;
+            background: #475569;
+            border-radius: 20px 20px 0 0;
+            position: absolute; top: -30px; left: -10px;
+            transform-origin: 5% 100%; /* Pivot from left hinge */
+            transition: transform 0.4s ease-in-out;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            z-index: 2;
+        }
+        .bin-lid::after { /* Handle */
+            content: ''; position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
+            width: 60px; height: 15px; background: #334155; border-radius: 10px 10px 0 0;
+        }
+
+        .bin-body {
+            width: 200px; height: 240px;
+            background: linear-gradient(180deg, #64748b 0%, #334155 100%);
+            border-radius: 0 0 20px 20px;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 1;
+        }
+        .bin-body::before {
+            content: ''; position: absolute; top: 30px; left: 20px; right: 20px; height: 180px;
+            border-left: 10px solid rgba(0,0,0,0.1); border-right: 10px solid rgba(0,0,0,0.1);
+        }
+        .bin-icon { font-size: 4rem; color: rgba(255,255,255,0.2); }
+
+        /* Animation States */
+        .big-bin-container.visible { transform: translateY(-50px); } 
+        .bin-lid.open { transform: rotate(-85deg); } 
+
+        /* --- CONFIRMATION MODAL --- */
+        .confirm-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
+            z-index: 200; display: none; align-items: center; justify-content: center;
+            opacity: 0; transition: opacity 0.3s ease;
+        }
+        .confirm-overlay.show { display: flex; opacity: 1; pointer-events: auto; }
+        
+        .confirm-card {
+            background: white; width: 400px; padding: 2rem; border-radius: 20px;
+            text-align: center; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            transform: scale(0.9); transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .confirm-overlay.show .confirm-card { transform: scale(1); }
+
+        .confirm-icon {
+            width: 70px; height: 70px; background: #fee2e2; color: #ef4444;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 2rem; margin: 0 auto 1.5rem;
+        }
+        .confirm-btn-group { display: flex; gap: 1rem; margin-top: 2rem; justify-content: center; }
+        .c-btn { padding: 0.8rem 1.5rem; border-radius: 10px; font-weight: 600; cursor: pointer; border: none; transition: 0.2s; }
+        .c-btn-cancel { background: #f1f5f9; color: var(--text-main); }
+        .c-btn-cancel:hover { background: #e2e8f0; }
+        .c-btn-delete { background: var(--danger); color: white; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3); }
+        .c-btn-delete:hover { background: #dc2626; transform: translateY(-2px); }
+
+        @media (max-width: 768px) { :root { --sidebar-width: 0px; } .sidebar { transform: translateX(-100%); width: 260px; } .sidebar.active { transform: translateX(0); } .mobile-menu-toggle { display: block; } .close-sidebar-btn { display: block; } }
+        .mobile-menu-toggle { display: none; font-size: 1.5rem; cursor: pointer; margin-right: 1rem; }
+        .close-sidebar-btn { display: none; cursor: pointer; color: var(--text-muted); }
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header"> <a href="home.html" class="logo">Design<span>Ease</span></a> <i class="fa-solid fa-xmark close-sidebar-btn" onclick="toggleSidebar()"></i> </div>
+        <div class="create-btn-container"> <button class="create-btn" onclick="location.href='editor.html'"><i class="fa-solid fa-plus"></i> Create Design</button> </div>
+        <ul class="nav-list">
+            <li class="nav-item"><a href="home.html" class="nav-link"><i class="fa-solid fa-house"></i> Home</a></li>
+            <li class="nav-item"><a href="projects.html" class="nav-link"><i class="fa-solid fa-folder-open"></i> Projects</a></li>
+            <li class="nav-item"><a href="templates.html" class="nav-link"><i class="fa-solid fa-layer-group"></i> Templates</a></li>
+            <li class="nav-divider"></li>
+            <li class="nav-label">Tools</li>
+            <li class="nav-item"><a href="ai-generator.html" class="nav-link"><i class="fa-solid fa-robot"></i> AI Image Gen</a></li>
+            <li class="nav-item"><a href="content-planner.html" class="nav-link"><i class="fa-solid fa-calendar-days"></i> Content Planner</a></li>
+            <li class="nav-divider"></li>
+            <li class="nav-label">Team</li>
+            <li class="nav-item"><a href="invite.html" class="nav-link"><i class="fa-solid fa-users"></i> Invite Members</a></li>
+            <li class="nav-item"><a href="settings.html" class="nav-link"><i class="fa-solid fa-gear"></i> Settings</a></li>
+            <li class="nav-item"><a href="trash.html" class="nav-link active"><i class="fa-solid fa-trash"></i> Trash</a></li>
+        </ul>
+         <div class="sidebar-footer">
+            <div class="user-card">
+                <div class="user-avatar" id="userAvatar">G</div>
+                <div class="user-info"><h4 id="userName">Guest</h4><p id="userEmail">Login needed</p></div>
+                <div class="logout-btn" onclick="SessionManager.logout()" title="Logout"><i class="fa-solid fa-right-from-bracket"></i></div>
+            </div>
+        </div>
+    </aside>
+
+    <div class="main-wrapper">
+        <header class="top-header">
+            <div style="display: flex; align-items: center;"> <i class="fa-solid fa-bars mobile-menu-toggle" onclick="toggleSidebar()"></i> <h2 style="font-weight: 700; font-size: 1.25rem;">Trash</h2> </div>
+            <div class="header-actions"> 
+                <button class="btn-danger" id="emptyTrashBtn" onclick="TrashApp.requestEmpty()">
+                    <i class="fa-solid fa-trash-can"></i> &nbsp;Empty Trash
+                </button> 
+            </div>
+        </header>
+
+        <div class="page-content">
+            <div class="info-banner" id="infoBanner"> <i class="fa-solid fa-circle-info"></i> <p>Items in the trash are permanently deleted after 30 days.</p> </div>
+            
+            <div class="trash-grid" id="trashGrid"></div>
+            
+            <div class="empty-state" id="emptyState">
+                <i class="fa-solid fa-trash-can-arrow-up" style="font-size: 4rem; color: #cbd5e1; margin-bottom: 1rem;"></i>
+                <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem;">Trash is empty</h3>
+                <p style="color: var(--text-muted);">Items you delete will show up here. Keeps your workspace tidy!</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="animation-layer" id="animLayer">
+        <div class="big-bin-container" id="bigBin">
+            <div class="bin-lid" id="binLid"></div>
+            <div class="bin-body" id="binBody">
+                <i class="fa-solid fa-trash-can bin-icon"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="confirm-overlay" id="confirmOverlay">
+        <div class="confirm-card">
+            <div class="confirm-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            <h2 style="margin-bottom: 10px; font-weight: 800; color: var(--text-main);">Are you sure?</h2>
+            <p style="color: var(--text-muted); line-height: 1.5;">
+                This will permanently delete all items in the trash.<br>This action cannot be undone.
+            </p>
+            <div class="confirm-btn-group">
+                <button class="c-btn c-btn-cancel" onclick="TrashApp.cancelEmpty()">Cancel</button>
+                <button class="c-btn c-btn-delete" onclick="TrashApp.confirmAndAnimate()">Yes, Empty Trash</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SessionManager = {
+            currentUser: null,
+            init() {
+                const userStr = localStorage.getItem('user');
+                if (!userStr) { window.location.href = 'index.html'; return; }
+                this.currentUser = JSON.parse(userStr);
+                document.getElementById('userName').textContent = this.currentUser.name;
+                document.getElementById('userEmail').textContent = this.currentUser.email;
+                document.getElementById('userAvatar').textContent = this.currentUser.name.substring(0,2).toUpperCase();
+            },
+            logout() { localStorage.removeItem('user'); window.location.href = 'index.html'; }
+        };
+
+        const TrashApp = {
+            dbName: 'DesignEaseDB_V2', version: 2,
+            
+            async init() {
+                await this.openDB();
+                this.loadTrashItems();
+            },
+            async openDB() {
+                return new Promise((resolve, reject) => {
+                    const req = indexedDB.open(this.dbName, this.version);
+                    req.onupgradeneeded = (e) => { 
+                        const db = e.target.result;
+                        if (!db.objectStoreNames.contains('designs')) db.createObjectStore('designs', { keyPath: 'id' });
+                        if (!db.objectStoreNames.contains('trash')) db.createObjectStore('trash', { keyPath: 'id' });
+                    };
+                    req.onsuccess = () => resolve(req.result);
+                });
+            },
+            async loadTrashItems() {
+                const db = await this.openDB();
+                const tx = db.transaction('trash', 'readonly');
+                const allItems = await new Promise(res => { tx.objectStore('trash').getAll().onsuccess = e => res(e.target.result); });
+                
+                const userItems = allItems.filter(i => i.owner === SessionManager.currentUser.email);
+                const grid = document.getElementById('trashGrid');
+                grid.innerHTML = '';
+
+                if (userItems.length === 0) {
+                    this.showEmptyState();
+                    return;
+                }
+
+                document.getElementById('emptyState').classList.remove('visible');
+                grid.style.display = 'grid';
+                document.getElementById('emptyTrashBtn').disabled = false;
+                document.getElementById('infoBanner').style.display = 'flex';
+
+                userItems.forEach(item => {
+                    const daysLeft = this.calcDaysLeft(item.deletedDate || new Date().toISOString());
+                    const thumb = item.thumbnail || 'https://via.placeholder.com/300';
+                    const card = document.createElement('div');
+                    card.className = 'trash-card';
+                    card.innerHTML = `
+                        <div class="card-preview">
+                            <img src="${thumb}">
+                            <div class="days-left-badge" style="${daysLeft<5?'background:#ef4444':''}">${daysLeft} days left</div>
+                        </div>
+                        <div class="card-body"><div class="card-title">${item.name}</div></div>
+                        <div class="card-actions">
+                            <div class="action-icon restore" onclick="TrashApp.restore('${item.id}')" title="Restore"><i class="fa-solid fa-rotate-left"></i></div>
+                            <div class="action-icon delete" onclick="TrashApp.deleteForever(this, '${item.id}')" title="Delete Forever"><i class="fa-solid fa-trash-can"></i></div>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+            },
+            
+            showEmptyState() {
+                document.getElementById('emptyState').classList.add('visible');
+                document.getElementById('trashGrid').style.display = 'none';
+                document.getElementById('emptyTrashBtn').disabled = true;
+                document.getElementById('infoBanner').style.display = 'none';
+            },
+
+            calcDaysLeft(dateStr) {
+                const diff = new Date(dateStr).getTime() + (30*24*60*60*1000) - Date.now();
+                return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
+            },
+
+            // --- STEP 1: REQUEST EMPTY (SHOW MODAL) ---
+            requestEmpty() {
+                const cards = document.querySelectorAll('.trash-card');
+                if(cards.length === 0) return;
+                document.getElementById('confirmOverlay').classList.add('show');
+            },
+
+            // --- STEP 2: CANCEL (HIDE MODAL) ---
+            cancelEmpty() {
+                document.getElementById('confirmOverlay').classList.remove('show');
+            },
+
+            // --- STEP 3: CONFIRM & PLAY ANIMATION ---
+            confirmAndAnimate() {
+                // 1. Hide Modal
+                document.getElementById('confirmOverlay').classList.remove('show');
+                document.getElementById('emptyTrashBtn').disabled = true;
+
+                // 2. Setup Animation Elements
+                const cards = document.querySelectorAll('.trash-card');
+                const bigBin = document.getElementById('bigBin');
+                const binLid = document.getElementById('binLid');
+                const binBody = document.getElementById('binBody');
+
+                // 3. Bin Slide Up
+                bigBin.classList.add('visible');
+
+                // 4. Open Lid
+                setTimeout(() => {
+                    binLid.classList.add('open');
+                }, 400);
+
+                // 5. Cards Fly In
+                setTimeout(() => {
+                    const binRect = binBody.getBoundingClientRect();
+                    const binCenterX = binRect.left + (binRect.width / 2);
+                    const binCenterY = binRect.top + (binRect.height / 2) - 50;
+
+                    cards.forEach((card, i) => {
+                        const cardRect = card.getBoundingClientRect();
+                        const moveX = binCenterX - (cardRect.left + cardRect.width/2);
+                        const moveY = binCenterY - (cardRect.top + cardRect.height/2);
+
+                        // Staggered animation
+                        setTimeout(() => {
+                            card.style.transition = 'transform 0.6s cubic-bezier(0.55, 0.085, 0.68, 0.53), opacity 0.6s';
+                            card.style.transform = `translate(${moveX}px, ${moveY}px) scale(0.1) rotate(20deg)`;
+                            card.style.opacity = '0';
+                            card.style.zIndex = '1000';
+                        }, i * 50);
+                    });
+
+                    // 6. Close Lid & Finish
+                    const totalAnimTime = cards.length * 50 + 600;
+                    
+                    setTimeout(() => {
+                        // Close Lid
+                        binLid.classList.remove('open');
+
+                        // Slide Bin Down & Clear DB
+                        setTimeout(async () => {
+                            bigBin.classList.remove('visible');
+                            
+                            // Perform Deletion
+                            const db = await this.openDB();
+                            const tx = db.transaction('trash', 'readwrite');
+                            const store = tx.objectStore('trash');
+                            store.clear(); // Clears all for demo (in production filter by user)
+                            
+                            // Update UI
+                            setTimeout(() => {
+                                this.loadTrashItems();
+                            }, 500);
+                        }, 400);
+
+                    }, totalAnimTime);
+
+                }, 800);
+            },
+
+            async restore(id) {
+                const db = await this.openDB();
+                const item = await new Promise(res => db.transaction('trash').objectStore('trash').get(id).onsuccess = e => res(e.target.result));
+                delete item.deletedDate;
+                await new Promise(res => db.transaction('designs', 'readwrite').objectStore('designs').put(item).onsuccess = res);
+                await new Promise(res => db.transaction('trash', 'readwrite').objectStore('trash').delete(id).onsuccess = res);
+                this.loadTrashItems();
+            },
+
+            async deleteForever(btn, id) {
+                if(!confirm('Delete this item?')) return;
+                const card = btn.closest('.trash-card');
+                card.style.opacity = '0';
+                card.style.transform = 'scale(0.8)';
+                const db = await this.openDB();
+                await new Promise(res => db.transaction('trash', 'readwrite').objectStore('trash').delete(id).onsuccess = res);
+                setTimeout(() => this.loadTrashItems(), 300);
+            }
+        };
+
+        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('active'); }
+        document.addEventListener('DOMContentLoaded', () => { SessionManager.init(); TrashApp.init(); });
+    </script>
+</body>
+</html>

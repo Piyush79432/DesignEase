@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Content Planner - DesignEase</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* --- 1. SHARED CSS (Layout & Variables) --- */
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --accent: #d946ef;
+            --bg-body: #f1f5f9;
+            --bg-sidebar: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --sidebar-width: 260px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.15);
+            --gradient-magic: linear-gradient(135deg, #6366f1 0%, #d946ef 100%);
+            
+            --insta: #E4405F;
+            --linkedin: #0A66C2;
+            --twitter: #000000;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            display: flex;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
+        button { border: none; outline: none; background: none; font-family: inherit; cursor: pointer; }
+
+        /* --- 2. SIDEBAR (Fixed) --- */
+        .sidebar {
+            position: fixed; top: 0; left: 0; width: var(--sidebar-width); height: 100vh;
+            background: var(--bg-sidebar); border-right: 1px solid var(--border);
+            display: flex; flex-direction: column; z-index: 50; padding: 1.5rem 1rem;
+            transition: transform 0.3s ease;
+        }
+
+        .logo { font-size: 1.5rem; font-weight: 800; background: var(--gradient-magic); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .sidebar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding: 0 0.5rem; }
+        
+        .create-btn {
+            width: 100%; padding: 0.75rem; background: var(--primary); color: white; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: var(--shadow-sm); margin-bottom: 1.5rem; transition: all 0.2s;
+        }
+        .create-btn:hover { background: var(--primary-dark); transform: translateY(-1px); }
+
+        .nav-list { flex: 1; overflow-y: auto; }
+        .nav-item { margin-bottom: 4px; }
+        .nav-link { display: flex; align-items: center; gap: 12px; padding: 0.6rem 0.8rem; color: var(--text-muted); border-radius: 8px; font-weight: 500; font-size: 0.95rem; transition: all 0.2s; }
+        .nav-link:hover { background: #f1f5f9; color: var(--primary); }
+        .nav-link.active { background: #e0e7ff; color: var(--primary); font-weight: 600; }
+        .nav-divider { height: 1px; background: var(--border); margin: 1rem 0; }
+        .nav-label { font-size: 0.75rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted); margin: 0 0 0.5rem 0.8rem; }
+        
+        /* UPDATED USER CARD STYLES */
+        .sidebar-footer { margin-top: auto; padding-top: 1rem; border-top: 1px solid var(--border); }
+        .user-card { display: flex; align-items: center; gap: 10px; padding: 0.5rem; border-radius: 8px; cursor: pointer; transition: background 0.2s; }
+        .user-card:hover { background: #f8fafc; }
+        .user-avatar { width: 36px; height: 36px; background: #e2e8f0; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.8rem; color: var(--text-main); }
+        .user-info h4 { font-size: 0.9rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px; }
+        .user-info p { font-size: 0.75rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px; }
+        .logout-btn { margin-left: auto; color: var(--text-muted); cursor: pointer; padding: 5px; }
+        .logout-btn:hover { color: #ef4444; }
+
+        /* --- 3. MAIN WRAPPER --- */
+        .main-wrapper {
+            margin-left: var(--sidebar-width);
+            width: calc(100% - var(--sidebar-width));
+            display: flex; flex-direction: column;
+            height: 100vh;
+        }
+
+        .top-header {
+            background: rgba(255, 255, 255, 0.95); 
+            backdrop-filter: blur(10px); 
+            padding: 1rem 2rem; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            border-bottom: 1px solid var(--border);
+            box-shadow: var(--shadow-sm);
+            z-index: 10;
+        }
+
+        /* --- 4. ENHANCED CALENDAR UI --- */
+        .page-content {
+            flex: 1;
+            padding: 1.5rem;
+            overflow-y: hidden;
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .calendar-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: white;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .calendar-controls {
+            padding: 1.25rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            background: linear-gradient(to bottom, #ffffff, #fafbfc);
+        }
+
+        .month-selector { display: flex; align-items: center; gap: 1rem; }
+        .month-selector h2 { font-size: 1.35rem; font-weight: 700; width: 180px; text-align: center; }
+        .nav-arrow { 
+            width: 36px; height: 36px; border-radius: 8px; 
+            border: 1px solid var(--border); 
+            display: flex; align-items: center; justify-content: center; 
+            transition: all 0.2s; 
+            background: white;
+        }
+        .nav-arrow:hover { background: var(--primary); color: white; transform: scale(1.05); }
+
+        .view-options button {
+            padding: 0.5rem 1.2rem; font-size: 0.85rem; font-weight: 600; 
+            border: 1px solid var(--border); background: white; 
+            transition: all 0.2s;
+        }
+        .view-options button:first-child { border-radius: 8px 0 0 8px; border-right: none; }
+        .view-options button:last-child { border-radius: 0 8px 8px 0; }
+        .view-options button.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .view-options button:hover:not(.active) { background: #f8fafc; }
+
+        /* Grid */
+        .calendar-grid {
+            flex: 1;
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            grid-template-rows: 40px repeat(5, 1fr);
+            overflow-y: auto;
+        }
+
+        .day-header {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-bottom: 2px solid var(--border);
+            border-right: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .day-cell {
+            border-right: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            padding: 10px;
+            min-height: 120px;
+            position: relative;
+            transition: all 0.2s;
+            background: white;
+        }
+        .day-cell:hover { 
+            background: linear-gradient(135deg, #fafbff 0%, #f8f9ff 100%); 
+            box-shadow: inset 0 0 0 1px var(--primary);
+        }
+        
+        .date-num {
+            font-size: 0.9rem; 
+            font-weight: 700; 
+            color: var(--text-muted); 
+            margin-bottom: 8px; 
+            display: inline-block;
+        }
+        .day-cell.today .date-num {
+            background: var(--gradient-magic); 
+            color: white; 
+            width: 28px; 
+            height: 28px; 
+            border-radius: 50%; 
+            display: inline-flex; 
+            align-items: center; 
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .day-cell.other-month { background: #fcfcfc; }
+        .day-cell.other-month .date-num { opacity: 0.3; }
+
+        /* Drop Zone Styling */
+        .day-cell.drag-over {
+            background: linear-gradient(135deg, #e0e7ff 0%, #ddd6fe 100%);
+            box-shadow: inset 0 0 0 2px var(--primary);
+        }
+
+        /* Add Post Button on Hover */
+        .add-post-trigger {
+            position: absolute; 
+            bottom: 8px; 
+            right: 8px;
+            opacity: 0; 
+            transition: all 0.2s;
+            z-index: 5;
+        }
+        .day-cell:hover .add-post-trigger { opacity: 1; transform: scale(1); }
+        .add-icon { 
+            background: var(--gradient-magic); 
+            color: white; 
+            width: 32px; 
+            height: 32px; 
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            box-shadow: var(--shadow-md);
+            transition: all 0.2s;
+        }
+        .add-icon:hover { transform: rotate(90deg) scale(1.1); }
+
+        /* Enhanced Post Pills */
+        .post-pill {
+            background: white; 
+            border: 1px solid var(--border); 
+            border-left: 3px solid;
+            border-radius: 6px; 
+            padding: 6px 8px; 
+            margin-bottom: 6px;
+            font-size: 0.75rem; 
+            cursor: grab; 
+            box-shadow: var(--shadow-sm);
+            display: flex; 
+            align-items: center; 
+            gap: 6px; 
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+        .post-pill:hover { 
+            transform: translateY(-2px); 
+            box-shadow: var(--shadow-lg); 
+            z-index: 10;
+        }
+        .post-pill:active { cursor: grabbing; }
+        .post-pill.dragging { opacity: 0.5; transform: rotate(3deg); }
+        
+        .post-pill.insta { border-left-color: var(--insta); }
+        .post-pill.linkedin { border-left-color: var(--linkedin); }
+        .post-pill.twitter { border-left-color: var(--twitter); }
+        
+        .post-pill .pill-delete {
+            margin-left: auto;
+            opacity: 0;
+            transition: opacity 0.2s;
+            color: #ef4444;
+        }
+        .post-pill:hover .pill-delete { opacity: 1; }
+
+        /* Drafts Panel */
+        .drafts-panel {
+            width: 300px;
+            background: white;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            display: flex; 
+            flex-direction: column;
+            box-shadow: var(--shadow-md);
+        }
+        .drafts-header { 
+            padding: 1.25rem; 
+            border-bottom: 1px solid var(--border); 
+            font-weight: 700; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            background: linear-gradient(to bottom, #ffffff, #fafbfc);
+        }
+        .drafts-list { padding: 1rem; flex: 1; overflow-y: auto; }
+        
+        .draft-item {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); 
+            border: 2px dashed var(--border); 
+            border-radius: 10px;
+            padding: 1rem; 
+            margin-bottom: 1rem; 
+            cursor: grab;
+            transition: all 0.2s;
+            position: relative;
+        }
+        .draft-item:hover { 
+            border-color: var(--primary); 
+            background: linear-gradient(135deg, #e0e7ff 0%, #ddd6fe 100%);
+            transform: translateX(4px);
+            box-shadow: var(--shadow-md);
+        }
+        .draft-item:active { cursor: grabbing; }
+        .draft-item.dragging { opacity: 0.5; transform: rotate(-3deg); }
+        
+        .draft-meta { 
+            display: flex; 
+            justify-content: space-between; 
+            font-size: 0.7rem; 
+            color: var(--text-muted); 
+            margin-top: 8px; 
+        }
+
+        /* AI Suggestion Badge */
+        .ai-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--gradient-magic);
+            color: white;
+            font-size: 0.65rem;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-weight: 700;
+            box-shadow: var(--shadow-sm);
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            animation: fadeIn 0.2s;
+        }
+        .modal-overlay.active { display: flex; }
+
+        .modal {
+            background: white;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+            animation: slideUp 0.3s;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+        }
+        .modal-header h3 { font-size: 1.25rem; font-weight: 700; }
+
+        .modal-body {
+            padding: 1.5rem;
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-main);
+        }
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+        }
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .platform-selector {
+            display: flex;
+            gap: 1rem;
+        }
+        .platform-option {
+            flex: 1;
+            padding: 1rem;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .platform-option:hover {
+            border-color: var(--primary);
+            background: #f8fafc;
+        }
+        .platform-option.selected {
+            border-color: var(--primary);
+            background: #e0e7ff;
+        }
+        .platform-option i {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .modal-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            background: #fafbfc;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .btn-primary {
+            background: var(--gradient-magic);
+            color: white;
+            box-shadow: var(--shadow-sm);
+        }
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+        .btn-secondary {
+            background: white;
+            border: 1px solid var(--border);
+            color: var(--text-main);
+        }
+        .btn-secondary:hover {
+            background: #f8fafc;
+        }
+
+        .ai-generate-btn {
+            background: var(--gradient-magic);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-top: 0.5rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+        }
+        .ai-generate-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 1100px) {
+            .page-content { flex-direction: column; overflow-y: auto; }
+            .calendar-section { min-height: 600px; }
+            .drafts-panel { width: 100%; height: auto; }
+        }
+        @media (max-width: 768px) {
+            :root { --sidebar-width: 0px; }
+            .sidebar { transform: translateX(-100%); width: 260px; }
+            .sidebar.active { transform: translateX(0); box-shadow: 10px 0 20px rgba(0,0,0,0.1); }
+            .mobile-menu-toggle { display: block; }
+            .close-sidebar-btn { display: block; }
+        }
+        .mobile-menu-toggle { display: none; font-size: 1.5rem; cursor: pointer; }
+        .close-sidebar-btn { display: none; cursor: pointer; color: var(--text-muted); }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: var(--shadow-lg);
+            border-left: 4px solid var(--primary);
+            display: none;
+            align-items: center;
+            gap: 1rem;
+            z-index: 1000;
+            animation: slideInRight 0.3s;
+        }
+        .toast.active { display: flex; }
+
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(100%); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="home.html" class="logo">Design<span>Ease</span></a>
+            <i class="fa-solid fa-xmark close-sidebar-btn" onclick="toggleSidebar()"></i>
+        </div>
+        
+        <div class="create-btn-container">
+            <button class="create-btn" onclick="location.href='editor.html'">
+                <i class="fa-solid fa-plus"></i> Create a design
+            </button>
+        </div>
+
+        <ul class="nav-list">
+            <li class="nav-item"><a href="home.html" class="nav-link"><i class="fa-solid fa-house"></i> Home</a></li>
+            <li class="nav-item"><a href="projects.html" class="nav-link"><i class="fa-solid fa-folder-open"></i> Projects</a></li>
+            <li class="nav-item"><a href="templates.html" class="nav-link"><i class="fa-solid fa-layer-group"></i> Templates</a></li>
+            
+            <li class="nav-divider"></li>
+            <li class="nav-label">Tools</li>
+        
+            <li class="nav-item"><a href="ai-generator.html" class="nav-link"><i class="fa-solid fa-robot"></i> AI Image Gen</a></li>
+            <li class="nav-item"><a href="content-planner.html" class="nav-link active"><i class="fa-solid fa-calendar-days"></i> Content Planner</a></li>
+            
+            <li class="nav-divider"></li>
+            <li class="nav-label">Team</li>
+            <li class="nav-item"><a href="invite.html" class="nav-link"><i class="fa-solid fa-users"></i> Invite Members</a></li>
+            <li class="nav-item"><a href="settings.html" class="nav-link"><i class="fa-solid fa-gear"></i> Settings</a></li>
+            <li class="nav-item"><a href="trash.html" class="nav-link"><i class="fa-solid fa-trash"></i> Trash</a></li>
+        </ul>
+
+        <div class="sidebar-footer">
+            <div class="user-card">
+                <div class="user-avatar" id="userAvatar">G</div>
+                <div class="user-info">
+                    <h4 id="userName">Guest</h4>
+                    <p id="userEmail" style="font-size:0.75rem; color:var(--text-muted);">Please Login</p>
+                </div>
+                <div class="logout-btn" onclick="SessionManager.logout()" title="Logout">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <div class="main-wrapper">
+        <header class="top-header">
+            <div style="display: flex; align-items: center;">
+                <i class="fa-solid fa-bars mobile-menu-toggle" onclick="toggleSidebar()" style="margin-right: 1rem;"></i>
+                <h2 style="font-weight: 700; font-size: 1.25rem;">Content Planner</h2>
+            </div>
+            <div class="header-actions">
+                <button class="create-btn" onclick="openModal()" style="width: auto; margin-bottom: 0; padding: 0.5rem 1.2rem; font-size: 0.9rem;">
+                    <i class="fa-solid fa-plus"></i> New Post
+                </button>
+            </div>
+        </header>
+
+        <div class="page-content">
+            
+            <div class="calendar-section">
+                <div class="calendar-controls">
+                    <div class="month-selector">
+                        <button class="nav-arrow" onclick="changeMonth(-1)"><i class="fa-solid fa-chevron-left"></i></button>
+                        <h2 id="currentMonth">December 2025</h2>
+                        <button class="nav-arrow" onclick="changeMonth(1)"><i class="fa-solid fa-chevron-right"></i></button>
+                    </div>
+                    <div class="view-options">
+                        <button class="active">Month</button>
+                        <button>Week</button>
+                        <button>Day</button>
+                    </div>
+                </div>
+
+                <div class="calendar-grid" id="calendarGrid">
+                    <div class="day-header">Sun</div>
+                    <div class="day-header">Mon</div>
+                    <div class="day-header">Tue</div>
+                    <div class="day-header">Wed</div>
+                    <div class="day-header">Thu</div>
+                    <div class="day-header">Fri</div>
+                    <div class="day-header">Sat</div>
+                    </div>
+            </div>
+
+            <aside class="drafts-panel">
+                <div class="drafts-header">
+                    <span><i class="fa-solid fa-inbox"></i> Unscheduled</span>
+                    <i class="fa-solid fa-plus" style="font-size: 0.9rem; cursor: pointer; color: var(--primary);" onclick="openModal()"></i>
+                </div>
+                <div class="drafts-list" id="draftsList">
+                    </div>
+            </aside>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modalTitle">Create New Post</h3>
+                <i class="fa-solid fa-xmark" style="cursor: pointer; font-size: 1.25rem;" onclick="closeModal()"></i>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Platform</label>
+                    <div class="platform-selector">
+                        <div class="platform-option" onclick="selectPlatform('instagram')" data-platform="instagram">
+                            <i class="fa-brands fa-instagram" style="color: var(--insta);"></i>
+                            <div style="font-size: 0.85rem; font-weight: 600;">Instagram</div>
+                        </div>
+                        <div class="platform-option" onclick="selectPlatform('linkedin')" data-platform="linkedin">
+                            <i class="fa-brands fa-linkedin" style="color: var(--linkedin);"></i>
+                            <div style="font-size: 0.85rem; font-weight: 600;">LinkedIn</div>
+                        </div>
+                        <div class="platform-option" onclick="selectPlatform('twitter')" data-platform="twitter">
+                            <i class="fa-brands fa-x-twitter"></i>
+                            <div style="font-size: 0.85rem; font-weight: 600;">Twitter</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Post Topic</label>
+                    <input type="text" id="postTitle" placeholder="e.g., Product launch, Company news, Tips...">
+                </div>
+
+                <div class="form-group">
+                    <label>Content <span style="color: var(--text-muted); font-weight: 400; font-size: 0.85rem;">(AI-powered)</span></label>
+                    <textarea id="postContent" placeholder="Describe your post or click Generate to let AI write it for you..."></textarea>
+                    <button class="ai-generate-btn" onclick="generateAIContent()">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        <span id="generateBtnText">Generate with AI</span>
+                    </button>
+                </div>
+
+                <div class="form-group">
+                    <label>Schedule Date (Optional)</label>
+                    <input type="date" id="postDate">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="savePost()">
+                    <i class="fa-solid fa-check"></i> Save Post
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast">
+        <i class="fa-solid fa-check-circle" style="color: var(--primary); font-size: 1.25rem;"></i>
+        <span id="toastMessage">Post added successfully!</span>
+    </div>
+
+    <script>
+        // --- SESSION MANAGEMENT LOGIC ---
+        const SessionManager = {
+            init() {
+                const userStr = localStorage.getItem('user');
+                
+                if (!userStr) {
+                    // window.location.href = 'login.html'; // Uncomment to enforce login
+                    return;
+                }
+
+                try {
+                    const user = JSON.parse(userStr);
+                    this.updateUI(user);
+                } catch (e) {
+                    console.error("Invalid session data", e);
+                    localStorage.removeItem('user');
+                }
+            },
+
+            updateUI(user) {
+                // Update Sidebar Elements
+                const nameEl = document.getElementById('userName');
+                const emailEl = document.getElementById('userEmail');
+                const avatarEl = document.getElementById('userAvatar');
+
+                if (nameEl) nameEl.textContent = user.name || "User";
+                if (emailEl) emailEl.textContent = user.email || "No Email";
+                
+                // Create initials for avatar
+                if (avatarEl && user.name) {
+                    const initials = user.name.split(' ')
+                        .map(n => n[0])
+                        .slice(0, 2)
+                        .join('')
+                        .toUpperCase();
+                    avatarEl.textContent = initials;
+                }
+            },
+
+            logout() {
+                localStorage.removeItem('user');
+                alert("Logged out successfully");
+               window.location.href = 'index.html'; 
+            }
+        };
+
+        // --- CONTENT PLANNER LOGIC ---
+        let currentMonth = 12;
+        let currentYear = 2025;
+        let selectedPlatform = null;
+        let draggedElement = null;
+        let posts = {};
+        let drafts = [];
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            SessionManager.init();
+            initSampleData();
+        });
+
+        function initSampleData() {
+            posts = {
+                '2025-12-3': [{platform: 'instagram', title: 'Product Launch', id: 1}],
+                '2025-12-5': [{platform: 'linkedin', title: 'Company News', id: 2}],
+                '2025-12-10': [{platform: 'twitter', title: 'Flash Sale!', id: 3}],
+                '2025-12-12': [{platform: 'instagram', title: 'Reel: BTS', id: 4}],
+                '2025-12-24': [{platform: 'instagram', title: 'Holiday Card', id: 5}],
+                '2025-12-25': [{platform: 'linkedin', title: 'Merry Xmas', id: 6}]
+            };
+            
+            drafts = [
+                {id: 101, platform: 'linkedin', title: 'Client Testimonial #3', content: 'Working with us has been amazing!'},
+                {id: 102, platform: 'twitter', title: 'New Feature Teaser', content: 'Something exciting coming soon...'},
+                {id: 103, platform: 'instagram', title: 'Weekend Vibes', content: 'Happy weekend everyone!'}
+            ];
+            
+            renderCalendar();
+            renderDrafts();
+        }
+
+        // Calendar rendering
+        function renderCalendar() {
+            const grid = document.getElementById('calendarGrid');
+            const firstDay = new Date(currentYear, currentMonth - 1, 1).getDay();
+            const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
+            const today = new Date();
+            
+            document.getElementById('currentMonth').textContent = 
+                new Date(currentYear, currentMonth - 1).toLocaleDateString('en-US', {month: 'long', year: 'numeric'});
+            
+            // Clear existing days
+            const headers = grid.querySelectorAll('.day-header');
+            grid.innerHTML = '';
+            headers.forEach(h => grid.appendChild(h));
+            
+            // Previous month days
+            const prevMonthDays = new Date(currentYear, currentMonth - 1, 0).getDate();
+            for (let i = firstDay - 1; i >= 0; i--) {
+                const day = prevMonthDays - i;
+                const cell = createDayCell(day, true);
+                grid.appendChild(cell);
+            }
+            
+            // Current month days
+            for (let day = 1; day <= daysInMonth; day++) {
+                const isToday = day === today.getDate() && 
+                                currentMonth === (today.getMonth() + 1) && 
+                                currentYear === today.getFullYear();
+                const cell = createDayCell(day, false, isToday);
+                grid.appendChild(cell);
+            }
+            
+            // Next month days
+            const remainingCells = 35 - (firstDay + daysInMonth); // 5 weeks * 7 days - 7 headers
+            for (let day = 1; day <= remainingCells; day++) {
+                const cell = createDayCell(day, true);
+                grid.appendChild(cell);
+            }
+        }
+
+        function createDayCell(day, otherMonth = false, isToday = false) {
+            const cell = document.createElement('div');
+            cell.className = `day-cell ${otherMonth ? 'other-month' : ''} ${isToday ? 'today' : ''}`;
+            
+            const dateStr = `${currentYear}-${currentMonth}-${day}`;
+            cell.dataset.date = dateStr;
+            
+            cell.innerHTML = `<span class="date-num">${day}</span>`;
+            
+            // Add posts for this date
+            if (posts[dateStr]) {
+                posts[dateStr].forEach(post => {
+                    const pill = createPostPill(post);
+                    cell.appendChild(pill);
+                });
+            }
+            
+            // Add button
+            const addBtn = document.createElement('div');
+            addBtn.className = 'add-post-trigger';
+            addBtn.innerHTML = '<div class="add-icon"><i class="fa-solid fa-plus"></i></div>';
+            addBtn.onclick = () => openModal(dateStr);
+            cell.appendChild(addBtn);
+            
+            // Drop zone
+            cell.addEventListener('dragover', handleDragOver);
+            cell.addEventListener('drop', handleDrop);
+            cell.addEventListener('dragleave', handleDragLeave);
+            
+            return cell;
+        }
+
+        function createPostPill(post) {
+            const pill = document.createElement('div');
+            pill.className = `post-pill ${post.platform}`;
+            pill.draggable = true;
+            pill.dataset.postId = post.id;
+            
+            const icons = {
+                instagram: 'fa-brands fa-instagram',
+                linkedin: 'fa-brands fa-linkedin',
+                twitter: 'fa-brands fa-x-twitter'
+            };
+            
+            const colors = {
+                instagram: 'var(--insta)',
+                linkedin: 'var(--linkedin)',
+                twitter: 'var(--twitter)'
+            };
+            
+            pill.innerHTML = `
+                <i class="${icons[post.platform]}" style="color: ${colors[post.platform]}"></i>
+                <span>${post.title}</span>
+                <i class="fa-solid fa-xmark pill-delete" onclick="deletePost(event, ${post.id})"></i>
+            `;
+            
+            pill.addEventListener('dragstart', handleDragStart);
+            pill.addEventListener('dragend', handleDragEnd);
+            
+            return pill;
+        }
+
+        // Drafts rendering
+        function renderDrafts() {
+            const draftsList = document.getElementById('draftsList');
+            draftsList.innerHTML = '';
+            
+            if (drafts.length === 0) {
+                draftsList.innerHTML = '<p style="color: var(--text-muted); text-align: center; padding: 2rem;">No drafts yet</p>';
+                return;
+            }
+            
+            drafts.forEach(draft => {
+                const item = document.createElement('div');
+                item.className = 'draft-item';
+                item.draggable = true;
+                item.dataset.draftId = draft.id;
+                
+                const icons = {
+                    instagram: 'fa-brands fa-instagram',
+                    linkedin: 'fa-brands fa-linkedin',
+                    twitter: 'fa-brands fa-x-twitter'
+                };
+                
+                // Check if this is AI-generated (for demo, add badge to first draft)
+                const aiBadge = draft.id === 101 ? '<span class="ai-badge">AI</span>' : '';
+                
+                item.innerHTML = `
+                    ${aiBadge}
+                    <p style="font-size:0.85rem; font-weight:600;">${draft.title}</p>
+                    <div class="draft-meta">
+                        <span><i class="${icons[draft.platform]}"></i> ${draft.platform.charAt(0).toUpperCase() + draft.platform.slice(1)}</span>
+                        <span>Draft</span>
+                    </div>
+                `;
+                
+                item.addEventListener('dragstart', handleDragStart);
+                item.addEventListener('dragend', handleDragEnd);
+                
+                draftsList.appendChild(item);
+            });
+        }
+
+        // Drag and Drop handlers
+        function handleDragStart(e) {
+            draggedElement = e.target;
+            e.target.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+        }
+
+        function handleDragEnd(e) {
+            e.target.classList.remove('dragging');
+        }
+
+        function handleDragOver(e) {
+            if (e.preventDefault) e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            
+            const cell = e.currentTarget;
+            if (cell.classList.contains('day-cell')) {
+                cell.classList.add('drag-over');
+            }
+            return false;
+        }
+
+        function handleDragLeave(e) {
+            e.currentTarget.classList.remove('drag-over');
+        }
+
+        function handleDrop(e) {
+            if (e.stopPropagation) e.stopPropagation();
+            e.preventDefault();
+            
+            const cell = e.currentTarget;
+            cell.classList.remove('drag-over');
+            
+            if (!draggedElement) return;
+            
+            const targetDate = cell.dataset.date;
+            
+            // Handle draft to calendar
+            if (draggedElement.classList.contains('draft-item')) {
+                const draftId = parseInt(draggedElement.dataset.draftId);
+                const draft = drafts.find(d => d.id === draftId);
+                
+                if (draft) {
+                    // Add to calendar
+                    if (!posts[targetDate]) posts[targetDate] = [];
+                    posts[targetDate].push({...draft, id: Date.now()});
+                    
+                    // Remove from drafts
+                    drafts = drafts.filter(d => d.id !== draftId);
+                    
+                    renderCalendar();
+                    renderDrafts();
+                    showToast('Post scheduled successfully!');
+                }
+            }
+            
+            // Handle post to different day
+            else if (draggedElement.classList.contains('post-pill')) {
+                const postId = parseInt(draggedElement.dataset.postId);
+                
+                // Find and remove from original date
+                for (let date in posts) {
+                    const index = posts[date].findIndex(p => p.id === postId);
+                    if (index !== -1) {
+                        const post = posts[date].splice(index, 1)[0];
+                        
+                        // Add to new date
+                        if (!posts[targetDate]) posts[targetDate] = [];
+                        posts[targetDate].push(post);
+                        
+                        renderCalendar();
+                        showToast('Post rescheduled!');
+                        break;
+                    }
+                }
+            }
+            
+            draggedElement = null;
+            return false;
+        }
+
+        // Modal functions
+        function openModal(date = null) {
+            document.getElementById('modalOverlay').classList.add('active');
+            document.getElementById('postDate').value = date || '';
+            
+            // Reset form
+            document.getElementById('postTitle').value = '';
+            document.getElementById('postContent').value = '';
+            selectedPlatform = null;
+            document.querySelectorAll('.platform-option').forEach(opt => opt.classList.remove('selected'));
+        }
+
+        function closeModal() {
+            document.getElementById('modalOverlay').classList.remove('active');
+        }
+
+        function selectPlatform(platform) {
+            selectedPlatform = platform;
+            document.querySelectorAll('.platform-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            document.querySelector(`[data-platform="${platform}"]`).classList.add('selected');
+        }
+
+        // AI Content Generation (simulated with real-time effect)
+        async function generateAIContent() {
+            const title = document.getElementById('postTitle').value;
+            if (!title) {
+                showToast('Please enter a post topic first!', 'error');
+                return;
+            }
+            
+            const btn = document.getElementById('generateBtnText');
+            const originalText = btn.textContent;
+            btn.innerHTML = '<span class="loading-spinner"></span> Generating...';
+            
+            // Simulate AI generation with typing effect
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            
+            const aiTexts = {
+                'product launch': `🚀 Excited to announce our latest innovation! We've poured our hearts into creating something truly special for you. Swipe to see what we've been working on. #NewProduct #Innovation #ComingSoon`,
+                'company news': `📢 Big news from our team! We're thrilled to share this milestone with our amazing community. Thank you for being part of our journey. More updates coming soon! #CompanyUpdate #Growth`,
+                'tips': `💡 Pro tip: Success comes from consistent small actions. Here's what we learned this week that transformed our workflow. Save this for later! #Tips #ProductivityHack`,
+                'default': `✨ ${title} - Join us as we explore new horizons and push boundaries. Your support means everything to us. Let's make magic happen together! #${title.replace(/\s/g, '')}`
+            };
+            
+            const lowerTitle = title.toLowerCase();
+            let generatedText = aiTexts.default;
+            
+            for (let key in aiTexts) {
+                if (lowerTitle.includes(key)) {
+                    generatedText = aiTexts[key];
+                    break;
+                }
+            }
+            
+            // Typing effect
+            const textarea = document.getElementById('postContent');
+            textarea.value = '';
+            let i = 0;
+            
+            const typeInterval = setInterval(() => {
+                if (i < generatedText.length) {
+                    textarea.value += generatedText.charAt(i);
+                    i++;
+                } else {
+                    clearInterval(typeInterval);
+                    btn.textContent = originalText;
+                }
+            }, 3);
+        }
+
+        function savePost() {
+            const title = document.getElementById('postTitle').value;
+            const content = document.getElementById('postContent').value;
+            const date = document.getElementById('postDate').value;
+            
+            if (!title || !selectedPlatform) {
+                showToast('Please fill in title and select a platform!', 'error');
+                return;
+            }
+            
+            const newPost = {
+                id: Date.now(),
+                platform: selectedPlatform,
+                title: title,
+                content: content
+            };
+            
+            if (date) {
+                // Add to calendar
+                if (!posts[date]) posts[date] = [];
+                posts[date].push(newPost);
+                renderCalendar();
+                showToast('Post scheduled successfully!');
+            } else {
+                // Add to drafts
+                drafts.push(newPost);
+                renderDrafts();
+                showToast('Draft saved!');
+            }
+            
+            closeModal();
+        }
+
+        function deletePost(event, postId) {
+            event.stopPropagation();
+            
+            for (let date in posts) {
+                posts[date] = posts[date].filter(p => p.id !== postId);
+                if (posts[date].length === 0) delete posts[date];
+            }
+            
+            renderCalendar();
+            showToast('Post deleted');
+        }
+
+        // Navigation
+        function changeMonth(direction) {
+            currentMonth += direction;
+            
+            if (currentMonth > 12) {
+                currentMonth = 1;
+                currentYear++;
+            } else if (currentMonth < 1) {
+                currentMonth = 12;
+                currentYear--;
+            }
+            
+            renderCalendar();
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+        }
+
+        // Toast notification
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMessage').textContent = message;
+            toast.classList.add('active');
+            
+            setTimeout(() => {
+                toast.classList.remove('active');
+            }, 3000);
+        }
+
+        // Close modal on overlay click
+        document.getElementById('modalOverlay').addEventListener('click', (e) => {
+            if (e.target.id === 'modalOverlay') closeModal();
+        });
+    </script>
+
+</body>
+</html>
