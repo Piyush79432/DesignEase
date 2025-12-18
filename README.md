@@ -95,6 +95,7 @@ graph LR
 ```bash
 git clone https://github.com/Piyush79432/DesignEase.git
 cd DesignEase
+```
 ### 3️⃣ Install Backend Dependencies
 ```bash
 npm install express mongoose cors body-parser
@@ -116,8 +117,6 @@ Open `server.js` and update the MongoDB URI:
 ```javascript
 // server.js
 const MONGO_URI = "mongodb+srv://<username>:<password>@cluster0.mongodb.net/designease?appName=Cluster0";
-⚠️ **Do not commit real credentials to public repositories**
-
 ```
 
 ### 6️⃣ Run the Application
@@ -125,16 +124,15 @@ const MONGO_URI = "mongodb+srv://<username>:<password>@cluster0.mongodb.net/desi
 #### Start Backend
 ```bash
 node server.js
+```
 **Expected Output:**
 🚀 Server running on http://localhost:5000  
 ✅ Connected to MongoDB Atlas  
 
-```
-
 ### Start Frontend
 Open `index.html` or `home.html` using a local server such as **Live Server** in VS Code.
 
----
+```
 
 ## 📂 Project Structure
 DesignEase/
@@ -156,3 +154,4 @@ DesignEase/
     subgraph Database
     DB -- "Persistent Data" --> Server
     end
+```
