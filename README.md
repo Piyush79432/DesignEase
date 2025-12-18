@@ -98,6 +98,7 @@ cd DesignEase
 ### 3️⃣ Install Backend Dependencies
 ```bash
 npm install express mongoose cors body-parser
+```
 ### 4️⃣ Setting Up MongoDB Atlas
 
 1. Create an account at **MongoDB Atlas**  
@@ -117,7 +118,7 @@ Open `server.js` and update the MongoDB URI:
 const MONGO_URI = "mongodb+srv://<username>:<password>@cluster0.mongodb.net/designease?appName=Cluster0";
 ⚠️ **Do not commit real credentials to public repositories**
 
----
+```
 
 ### 6️⃣ Run the Application
 
@@ -128,7 +129,7 @@ node server.js
 🚀 Server running on http://localhost:5000  
 ✅ Connected to MongoDB Atlas  
 
----
+```
 
 ### Start Frontend
 Open `index.html` or `home.html` using a local server such as **Live Server** in VS Code.
