@@ -134,7 +134,7 @@ Open `index.html` or `home.html` using a local server such as **Live Server** in
 
 
 ## 📂 Project Structure
-```
+```text
 DesignEase/
 │
 ├── public/ # Assets (Images, Icons, Styles)
@@ -149,9 +149,4 @@ DesignEase/
 ├── templates.html # Template Gallery
 ├── ai-generator.html # AI Tools
 ├── content-planner.html # Calendar Tool
-│
-└── README.md # Documentation
-    subgraph Database
-    DB -- "Persistent Data" --> Server
-    end
 ```
